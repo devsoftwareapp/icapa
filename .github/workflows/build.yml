@@ -9,59 +9,38 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout your repo
         uses: actions/checkout@v4
+
+      - name: Clone Capacitor SolidJS template
+        run: |
+          git clone https://github.com/ionic-team/capacitor-solidjs-templates.git template
+          mv template/basic app
+
+      - name: Copy your WEB files into app
+        run: |
+          rm -rf app/src
+          mkdir -p app/src
+          cp -r web/* app/src/
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      - name: Install Capacitor project
+      - name: Install & Prepare Project
         run: |
-          mkdir app
           cd app
-          
-          # package.json oluştur
-          cat << 'EOF' > package.json
-          {
-            "name": "pdfapp",
-            "version": "1.0.0",
-            "private": true,
-            "scripts": {
-              "build": "echo 'skip'",
-              "sync": "npx cap sync"
-            },
-            "dependencies": {
-              "@capacitor/android": "6.1.0",
-              "@capacitor/core": "6.1.0"
-            }
-          }
-          EOF
-
-          # capacitor.config.ts oluştur
-          cat << 'EOF' > capacitor.config.ts
-          import { CapacitorConfig } from '@capacitor/core';
-          const config: CapacitorConfig = {
-            appId: 'com.dev.pdf',
-            appName: 'PDF Reader',
-            webDir: 'web'
-          };
-          export default config;
-          EOF
-
-          mkdir web
-          cp -r ../web/* ./web/
-
           npm install
           npx cap add android
+          npx cap sync
 
-      - name: Build Android
+      - name: Build Android Debug APK
         run: |
           cd app/android
           ./gradlew assembleDebug
 
-      - name: Upload Debug APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: debug-apk
