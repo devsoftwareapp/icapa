@@ -1,86 +1,53 @@
-name: Build Capacitor Remix Template Android
+name: Build Debug APK
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # ------------------------
-      # 1) Repoyu çek (senin repo)
-      # ------------------------
-      - name: Checkout your repo
+      # Repo boş bile olsa checkout gereklidir
+      - name: Checkout Repo
         uses: actions/checkout@v3
 
-      # -----------------------------------
-      # 2) Template repo’yu indir (ZIP ile)
-      # -----------------------------------
+      # Template indir
       - name: Download Capacitor Remix Template
         run: |
           curl -L https://github.com/ionic-team/capacitor-remix-templates/archive/refs/heads/main.zip -o template.zip
           unzip template.zip -d template
+          mv template/capacitor-remix-templates-main project
           rm template.zip
-          cp -r template/capacitor-remix-templates-main/* ./   # köke kopyala
-          rm -rf template
 
-      # ------------------------------
-      # 3) Node ortamını kur
-      # ------------------------------
+      # Node
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      # ------------------------------
-      # 4) Bağımlılıkları kur
-      # ------------------------------
-      - name: Install dependencies
-        run: npm install
-
-      # ----------------------------------
-      # 5) Capacitor Android platform sync
-      # ----------------------------------
-      - name: Sync Capacitor Android
-        run: npx cap sync android
-
-      # -----------------------------------
-      # 6) Keystore’yı oluştur / decode et
-      # -----------------------------------
-      - name: Decode Android keystore
+      # npm install
+      - name: Install Dependencies
         run: |
-          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release-key.jks
+          cd project
+          npm install
 
-      # ------------------------------
-      # 7) Android release build
-      # ------------------------------
-      - name: Build Android (APK + AAB)
+      # cap sync android
+      - name: Capacitor Sync Android
         run: |
-          cd android
+          cd project
+          npx cap sync android
+
+      # Debug APK build
+      - name: Build Debug APK
+        run: |
+          cd project/android
           chmod +x gradlew
-          ./gradlew bundleRelease assembleRelease \
-            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/release-key.jks \
-            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
-            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
-            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+          ./gradlew assembleDebug
 
-      # ------------------------------
-      # 8) APK'yi upload et
-      # ------------------------------
-      - name: Upload APK
+      # APK artifact
+      - name: Upload Debug APK
         uses: actions/upload-artifact@v3
         with:
-          name: app-release.apk
-          path: android/app/build/outputs/apk/release/app-release.apk
-
-      # ------------------------------
-      # 9) AAB'yi upload et
-      # ------------------------------
-      - name: Upload AAB
-        uses: actions/upload-artifact@v3
-        with:
-          name: app-release.aab
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          name: app-debug.apk
+          path: project/android/app/build/outputs/apk/debug/app-debug.apk
