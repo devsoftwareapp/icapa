@@ -8,7 +8,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Repo boş bile olsa checkout gereklidir
       - name: Checkout Repo
         uses: actions/checkout@v4
 
@@ -17,35 +16,36 @@ jobs:
         run: |
           curl -L https://github.com/ionic-team/capacitor-remix-templates/archive/refs/heads/main.zip -o template.zip
           unzip template.zip -d template
-          mv template/capacitor-remix-templates-main project
-          rm template.zip
+          
+          # Zip içindeki klasör adını otomatik bul
+          TDIR=$(ls template)
+          
+          # Doğru klasörü project adıyla taşı
+          mv "template/$TDIR" project
+          
+          rm -rf template template.zip
 
-      # Node
-      - name: Setup Node
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
 
-      # npm install
       - name: Install Dependencies
         run: |
           cd project
           npm install
 
-      # cap sync android
       - name: Capacitor Sync Android
         run: |
           cd project
           npx cap sync android
 
-      # Debug APK build
       - name: Build Debug APK
         run: |
           cd project/android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      # Upload artifact (v4)
       - name: Upload Debug APK
         uses: actions/upload-artifact@v4
         with:
