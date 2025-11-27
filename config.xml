@@ -10,11 +10,14 @@
         Apache Cordova Team
     </author>
 
+    <!-- Uygulama giriş noktası -->
     <content src="web/index.html" />
 
+    <!-- Internet izinleri -->
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
 
+    <!-- Splashscreen -->
     <preference name="SplashScreenDelay" value="3000" />
     <preference name="AutoHideSplashScreen" value="true" />
     <preference name="FadeSplashScreen" value="true" />
@@ -23,12 +26,13 @@
     <preference name="AndroidWindowSplashScreenBackground" value="#ffffff" />
     <preference name="AndroidPostSplashScreenTheme" value="@style/Theme.AppCompat.NoActionBar"/>
 
+    <!-- Android ikon ve splash -->
     <platform name="android">
         <icon src="res/android/icon.png" />
         <splash src="res/screen/android/splash.png" density="xxxhdpi"/>
     </platform>
 
-    <!-- Gereken pluginler -->
+    <!-- ÇALIŞAN VE GEREKLİ PLUGINLER -->
     <plugin name="cordova-plugin-file" />
     <plugin name="cordova-plugin-android-permissions" />
     <plugin name="cordova-plugin-intent" />
