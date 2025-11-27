@@ -1,8 +1,8 @@
-name: Build PDF Reader RELEASE
+name: Build Capacitor Android
 
 on:
   push:
-    branches: [ main ]
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -10,46 +10,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-    - name: Setup environment
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y openjdk-11-jdk nodejs npm git imagemagick
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-    - name: Install Cordova
-      run: |
-        sudo npm install -g cordova@latest
+      - name: Install NPM dependencies
+        run: npm install
 
-    - name: Install project dependencies
-      run: |
-        npm install
+      - name: Install Capacitor CLI
+        run: npm install @capacitor/cli -g
 
-    # <<< Splash hazırlama adımı eklendi >>>
-    - name: Generate Android Splash Screens
-      run: |
-        chmod +x ./splash.sh
-        ./splash.sh
+      - name: Restore Android platform
+        run: |
+          npx cap sync android
 
-    - name: Sign & Build RELEASE APK/AAB
-      run: |
-        chmod +x ./sign.sh
-        ./sign.sh
-      env:
-        KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
-        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      - name: Prepare Android build
+        run: |
+          cd android
+          chmod +x gradlew
 
-    - name: Upload RELEASE APK
-      uses: actions/upload-artifact@v4
-      with:
-        name: pdf-reader-release-apk
-        path: ${{ github.workspace }}/platforms/android/app/build/outputs/apk/release/*.apk
+      # IMZALAMA DEĞİŞKENLERİNİ KUR
+      - name: Decode keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > my-release-key.jks
 
-    - name: Upload RELEASE AAB
-      uses: actions/upload-artifact@v4
-      with:
-        name: pdf-reader-release-aab
-        path: ${{ github.workspace }}/platforms/android/app/build/outputs/bundle/release/*.aab
+      - name: Build Release AAB + APK
+        run: |
+          cd android
+          ./gradlew bundleRelease assembleRelease \
+            -Pandroid.injected.signing.store.file=$GITHUB_WORKSPACE/my-release-key.jks \
+            -Pandroid.injected.signing.store.password=${{ secrets.KEYSTORE_PASSWORD }} \
+            -Pandroid.injected.signing.key.alias=${{ secrets.KEY_ALIAS }} \
+            -Pandroid.injected.signing.key.password=${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.apk
+          path: android/app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload AAB
+        uses: actions/upload-artifact@v3
+        with:
+          name: app-release.aab
+          path: android/app/build/outputs/bundle/release/app-release.aab
