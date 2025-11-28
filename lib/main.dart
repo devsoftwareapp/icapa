@@ -60,12 +60,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<Permission> _getRequiredPermission() async {
-    if (Platform.isAndroid) {
-      final deviceInfo = DeviceInfoPlugin();
-      final androidInfo = await deviceInfo.androidInfo;
-      if (androidInfo.version.sdkInt >= 33) {
-        return Permission.manageExternalStorage;
-      }
+    final deviceInfo = DeviceInfoPlugin();
+    final androidInfo = await deviceInfo.androidInfo;
+    if (androidInfo.version.sdkInt >= 33) {
+      return Permission.manageExternalStorage;
     }
     return Permission.storage;
   }
