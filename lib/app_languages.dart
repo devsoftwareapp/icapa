@@ -4,22 +4,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// Dil veri modeli - Ayrı bir class olarak
+class Language {
+  final String code;
+  final String name;
+  final String nativeName;
+  final String flag;
+
+  const Language({
+    required this.code,
+    required this.name,
+    required this.nativeName,
+    required this.flag,
+  });
+}
+
 class AppLanguages {
-  // Dil veri modeli
-  static class Language {
-    final String code;
-    final String name;
-    final String nativeName;
-    final String flag;
-
-    const Language({
-      required this.code,
-      required this.name,
-      required this.nativeName,
-      required this.flag,
-    });
-  }
-
   // Desteklenen diller listesi
   static final List<Language> supportedLanguages = [
     Language(code: 'en_US', name: 'English', nativeName: 'English', flag: '🇺🇸'),
