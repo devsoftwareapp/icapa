@@ -41,6 +41,20 @@ flutter:
   uses-material-design: true
   
   assets:
+
+    
+    # --- YENİ TOOLS HTML DOSYALARI ---
+    - assets/web/birlestirme.html
+    - assets/web/imza.html
+    - assets/web/res_pdf.html
+    - assets/web/pdf_resim_ekle.html
+    - assets/web/sesli_okuma.html
+    - assets/web/ocr.html
+    - assets/web/pdf_res.html
+    - assets/web/pdf_metin_ekle.html
+
+   #PDFjs zorunlu dosyalari
+  
     - assets/build/pdf.mjs
     - assets/build/pdf.worker.mjs
     - assets/web/viewer.css
