@@ -56,10 +56,42 @@ class ThemeManager with ChangeNotifier {
   }
 }
 
+// PDF Klasörü Yöneticisi
+class PdfFolderManager {
+  static Future<Directory> getPdfFolder() async {
+    final downloadDir = await getExternalStorageDirectory();
+    final pdfReaderDir = Directory('${downloadDir?.path}/PDF Reader');
+    
+    if (!await pdfReaderDir.exists()) {
+      await pdfReaderDir.create(recursive: true);
+    }
+    
+    return pdfReaderDir;
+  }
+
+  static Future<File> copyToPdfFolder(String sourcePath, String fileName) async {
+    final pdfDir = await getPdfFolder();
+    final sourceFile = File(sourcePath);
+    final destinationFile = File('${pdfDir.path}/$fileName');
+    
+    // Eğer dosya zaten varsa, ismine timestamp ekle
+    if (await destinationFile.exists()) {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final newFileName = '${p.withoutExtension(fileName)}_$timestamp.${p.extension(fileName)}';
+      return await sourceFile.copy('${pdfDir.path}/$newFileName');
+    }
+    
+    return await sourceFile.copy(destinationFile.path);
+  }
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   await InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  
+  // Uygulama başladığında PDF Reader klasörünü oluştur
+  await PdfFolderManager.getPdfFolder();
   
   final initialIntent = await _getInitialIntent();
   
@@ -95,6 +127,7 @@ class PdfManagerApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
           selectedItemColor: Color(0xFFD32F2F),
           unselectedItemColor: Colors.grey,
         ),
@@ -113,9 +146,9 @@ class PdfManagerApp extends StatelessWidget {
       darkTheme: ThemeData(
         primarySwatch: Colors.red,
         primaryColor: Color(0xFFD32F2F),
-        scaffoldBackgroundColor: Colors.grey[900],
+        scaffoldBackgroundColor: Color(0xFF121212),
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.grey[800],
+          backgroundColor: Color(0xFF1E1E1E),
           foregroundColor: Colors.white,
           elevation: 2,
           titleTextStyle: TextStyle(
@@ -129,7 +162,7 @@ class PdfManagerApp extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
         bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.grey[800],
+          backgroundColor: Color(0xFF1E1E1E),
           selectedItemColor: Color(0xFFD32F2F),
           unselectedItemColor: Colors.grey[400],
         ),
@@ -142,7 +175,7 @@ class PdfManagerApp extends StatelessWidget {
         ),
         cardTheme: CardTheme(
           elevation: 2,
-          color: Colors.grey[800],
+          color: Color(0xFF1E1E1E),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         ),
         textTheme: TextTheme(
@@ -151,15 +184,16 @@ class PdfManagerApp extends StatelessWidget {
         ),
       ),
       themeMode: _themeManager.themeMode,
-      home: HomePage(initialIntent: initialIntent),
+      home: HomePage(initialIntent: initialIntent, themeManager: _themeManager),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
   final Map<String, dynamic>? initialIntent;
+  final ThemeManager themeManager;
 
-  const HomePage({super.key, this.initialIntent});
+  const HomePage({super.key, this.initialIntent, required this.themeManager});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -183,9 +217,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   // Veritabanı için
   Database? _database;
-
-  // Tema yöneticisi
-  final ThemeManager _themeManager = ThemeManager();
 
   // Tab başlıkları
   final List<String> _tabTitles = ['Ana Sayfa', 'Araçlar', 'Dosyalar'];
@@ -393,12 +424,16 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         print('✅ Converted file path: $filePath');
       }
       
+      // PDF'i PDF Reader klasörüne kopyala
+      final fileName = _extractFileNameFromUri(uri);
+      final copiedFile = await PdfFolderManager.copyToPdfFolder(filePath, fileName);
+      
       await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => ViewerScreen(
-            fileUri: filePath,
-            fileName: _extractFileNameFromUri(uri),
+            fileUri: copiedFile.path,
+            fileName: fileName,
           ),
         ),
       );
@@ -611,24 +646,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
   }
 
-  Future<void> _copyFile(String filePath) async {
-    try {
-      final file = File(filePath);
-      final fileName = p.basename(filePath);
-      final appDocDir = await getApplicationDocumentsDirectory();
-      final newPath = '${appDocDir.path}/$fileName';
-      
-      await file.copy(newPath);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Dosya kopyalandı: $fileName')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Kopyalama hatası: $e')),
-      );
-    }
-  }
-
   Future<void> _deleteFile(String filePath) async {
     final fileName = p.basename(filePath);
     
@@ -696,39 +713,40 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     if (query.trim().isNotEmpty) {
       _addToSearchHistory(query.trim());
     }
-    // Arama işlemi burada yapılacak
-    print('Arama yapılıyor: $query');
+    setState(() {});
   }
 
   Widget _buildHomeTabContent() {
-    List<String> displayedFiles = _pdfFiles;
+    List<String> displayedFiles = [];
     final searchQuery = _searchController.text.trim().toLowerCase();
     
-    if (_isSearchMode && searchQuery.isNotEmpty) {
-      displayedFiles = _pdfFiles.where((file) => 
-        p.basename(file).toLowerCase().contains(searchQuery)
-      ).toList();
-    }
-
     switch (_currentHomeTabIndex) {
       case 0: // Cihazda
-        if (!_permissionGranted) {
-          return _buildPermissionRequest();
+        displayedFiles = _pdfFiles;
+        if (_isSearchMode && searchQuery.isNotEmpty) {
+          displayedFiles = _pdfFiles.where((file) => 
+            p.basename(file).toLowerCase().contains(searchQuery)
+          ).toList();
         }
-        if (_isLoading) {
-          return _buildLoadingState();
-        }
-        if (displayedFiles.isEmpty) {
-          return _buildEmptyState();
-        }
-        return _buildPdfList(displayedFiles);
+        break;
       case 1: // Son Kullanılanlar
-        return _buildRecentFiles();
+        displayedFiles = _recentFiles;
+        break;
       case 2: // Favoriler
-        return _buildFavorites();
-      default:
-        return Container();
+        displayedFiles = _favoriteFiles;
+        break;
     }
+
+    if (_currentHomeTabIndex == 0 && !_permissionGranted) {
+      return _buildPermissionRequest();
+    }
+    if (_currentHomeTabIndex == 0 && _isLoading) {
+      return _buildLoadingState();
+    }
+    if (displayedFiles.isEmpty) {
+      return _buildEmptyState();
+    }
+    return _buildPdfList(displayedFiles);
   }
 
   Widget _buildPermissionRequest() {
@@ -780,29 +798,64 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _buildEmptyState() {
+    String emptyText = '';
+    String emptySubtitle = '';
+    IconData emptyIcon = Icons.search_off;
+    
+    switch (_currentHomeTabIndex) {
+      case 0:
+        emptyText = _isSearchMode && _searchController.text.isNotEmpty 
+            ? 'Arama sonucu bulunamadı'
+            : 'PDF dosyası bulunamadı';
+        emptySubtitle = _isSearchMode && _searchController.text.isNotEmpty 
+            ? 'Farklı bir kelime ile aramayı deneyin'
+            : 'Dosya seçerek PDF ekleyebilirsiniz';
+        emptyIcon = _isSearchMode && _searchController.text.isNotEmpty 
+            ? Icons.search_off 
+            : Icons.folder_open;
+        break;
+      case 1:
+        emptyText = 'Henüz son açılan dosya yok';
+        emptySubtitle = 'PDF dosyalarını açtıkça burada görünecekler';
+        emptyIcon = Icons.history;
+        break;
+      case 2:
+        emptyText = 'Henüz favori dosyanız yok';
+        emptySubtitle = 'Beğendiğiniz dosyaları yıldız simgesine tıklayarak favorilere ekleyebilirsiniz';
+        emptyIcon = Icons.star;
+        break;
+    }
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.search_off, size: 64, color: Colors.grey),
+          Icon(emptyIcon, size: 64, color: Colors.grey),
           SizedBox(height: 16),
           Text(
-            _isSearchMode && _searchController.text.isNotEmpty 
-                ? 'Arama sonucu bulunamadı'
-                : 'PDF dosyası bulunamadı',
+            emptyText,
             style: TextStyle(fontSize: 18, color: Colors.grey),
-          ),
-          SizedBox(height: 16),
-          ElevatedButton(
-            onPressed: _scanDeviceForPdfs,
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFD32F2F)),
-            child: Text('Yeniden Tara', style: TextStyle(color: Colors.white)),
+            textAlign: TextAlign.center,
           ),
           SizedBox(height: 8),
-          TextButton(
-            onPressed: _pickPdfFile,
-            child: Text('Dosya Seç', style: TextStyle(color: Color(0xFFD32F2F))),
+          Text(
+            emptySubtitle,
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey, fontSize: 14),
           ),
+          if (_currentHomeTabIndex == 0) ...[
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: _scanDeviceForPdfs,
+              style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFD32F2F)),
+              child: Text('Yeniden Tara', style: TextStyle(color: Colors.white)),
+            ),
+            SizedBox(height: 8),
+            TextButton(
+              onPressed: _pickPdfFile,
+              child: Text('Dosya Seç', style: TextStyle(color: Color(0xFFD32F2F))),
+            ),
+          ],
         ],
       ),
     );
@@ -811,12 +864,12 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   Widget _buildPdfList(List<String> files) {
     return Column(
       children: [
-        if (_isSearchMode && _searchHistory.isNotEmpty)
+        if (_isSearchMode && _searchHistory.isNotEmpty && _currentHomeTabIndex == 0)
           _buildSearchHistory(),
         Expanded(
           child: ListView.builder(
             itemCount: files.length,
-            itemBuilder: (_, i) => _buildFileItem(files[i], false),
+            itemBuilder: (_, i) => _buildFileItem(files[i]),
           ),
         ),
       ],
@@ -861,7 +914,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildFileItem(String filePath, bool isFavorite) {
+  Widget _buildFileItem(String filePath) {
     final fileName = p.basename(filePath);
     final isFavorited = _favoriteFiles.contains(filePath);
     final file = File(filePath);
@@ -875,7 +928,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     }
 
     String formatDate(DateTime date) {
-      return '${date.day}.${date.month}.${date.year} - ${date.hour}:${date.minute.toString().padLeft(2, '0')}:${date.second.toString().padLeft(2, '0')}';
+      return '${date.day}.${date.month}.${date.year} - ${date.hour}:${date.minute.toString().padLeft(2, '0')}';
     }
 
     return Card(
@@ -890,22 +943,15 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
           child: Icon(Icons.picture_as_pdf, color: Colors.white, size: 24),
         ),
-        title: Text(fileName, style: TextStyle(fontWeight: FontWeight.w500)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              filePath.length > 50 ? '...${filePath.substring(filePath.length - 50)}' : filePath,
-              style: TextStyle(fontSize: 12, color: Colors.grey),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            SizedBox(height: 2),
-            Text(
-              '${formatFileSize(fileSize)} - ${formatDate(modifiedDate)}',
-              style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.w500),
-            ),
-          ],
+        title: Text(
+          fileName, 
+          style: TextStyle(fontWeight: FontWeight.w500),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        subtitle: Text(
+          '${formatFileSize(fileSize)} - ${formatDate(modifiedDate)}',
+          style: TextStyle(fontSize: 12, color: Colors.grey),
         ),
         onTap: () => _openViewer(filePath),
         trailing: Row(
@@ -928,9 +974,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               onSelected: (value) => _handleFileAction(value, filePath),
               itemBuilder: (BuildContext context) => [
                 PopupMenuItem(value: 'share', child: Text('Paylaş')),
-                PopupMenuItem(value: 'rename', child: Text('Yeniden Adlandır')),
                 PopupMenuItem(value: 'print', child: Text('Yazdır')),
-                PopupMenuItem(value: 'copy', child: Text('Kopyala')),
                 PopupMenuItem(value: 'delete', child: Text('Sil', style: TextStyle(color: Colors.red))),
               ],
             ),
@@ -948,125 +992,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       case 'print':
         _printFile(filePath);
         break;
-      case 'copy':
-        _copyFile(filePath);
-        break;
       case 'delete':
         _deleteFile(filePath);
         break;
-      case 'rename':
-        _showRenameDialog(filePath);
-        break;
     }
-  }
-
-  void _showRenameDialog(String filePath) {
-    final fileName = p.basename(filePath);
-    final TextEditingController renameController = TextEditingController(text: p.withoutExtension(fileName));
-    
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Dosyayı Yeniden Adlandır'),
-        content: TextField(
-          controller: renameController,
-          decoration: InputDecoration(
-            labelText: 'Yeni dosya adı',
-            suffixText: '.pdf',
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('İptal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Color(0xFFD32F2F)),
-            onPressed: () async {
-              final newName = '${renameController.text}.pdf';
-              final newPath = '${p.dirname(filePath)}/$newName';
-              
-              try {
-                await File(filePath).rename(newPath);
-                setState(() {
-                  final index = _pdfFiles.indexOf(filePath);
-                  if (index != -1) {
-                    _pdfFiles[index] = newPath;
-                  }
-                });
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Dosya yeniden adlandırıldı')),
-                );
-              } catch (e) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Yeniden adlandırma hatası: $e')),
-                );
-              }
-            },
-            child: Text('Kaydet', style: TextStyle(color: Colors.white)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildRecentFiles() {
-    if (_recentFiles.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.history, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
-              'Henüz son açılan dosya yok',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'PDF dosyalarını açtıkça burada görünecekler.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: _recentFiles.length,
-      itemBuilder: (_, i) => _buildFileItem(_recentFiles[i], false),
-    );
-  }
-
-  Widget _buildFavorites() {
-    if (_favoriteFiles.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.star, size: 64, color: Colors.grey),
-            SizedBox(height: 16),
-            Text(
-              'Henüz favori dosyanız yok',
-              style: TextStyle(fontSize: 18, color: Colors.grey),
-            ),
-            SizedBox(height: 8),
-            Text(
-              'Beğendiğiniz dosyaları yıldız simgesine tıklayarak\nfavorilere ekleyebilirsiniz.',
-              textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-          ],
-        ),
-      );
-    }
-
-    return ListView.builder(
-      itemCount: _favoriteFiles.length,
-      itemBuilder: (_, i) => _buildFileItem(_favoriteFiles[i], true),
-    );
   }
 
   Widget _buildToolsTab() {
@@ -1222,9 +1151,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: ListTile(
         leading: isIcon 
             ? Icon(icon as IconData, size: 24, color: Color(0xFFD32F2F))
-            : Image.asset(icon as String, width: 24, height: 24),
+            : Container(
+                width: 24,
+                height: 24,
+                child: Placeholder(), // Gerçek uygulamada asset image kullanın
+              ),
         title: Text(title, style: TextStyle(fontWeight: FontWeight.w500)),
-        trailing: Icon(Icons.add, color: Color(0xFFD32F2F)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFFD32F2F)),
         onTap: () => onTap(),
       ),
     );
@@ -1234,7 +1167,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     return Card(
       margin: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       child: ListTile(
-        leading: Image.asset('assets/icon/gmail.png', width: 24, height: 24),
+        leading: Container(
+          width: 24,
+          height: 24,
+          child: Placeholder(), // Gerçek uygulamada Gmail asset image kullanın
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1242,7 +1179,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             Text('Gmail', style: TextStyle(fontSize: 12, color: Colors.grey)),
           ],
         ),
-        trailing: Icon(Icons.add, color: Color(0xFFD32F2F)),
+        trailing: Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFFD32F2F)),
         onTap: () => _launchCloudService('Gmail'),
       ),
     );
@@ -1294,7 +1231,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -1331,24 +1268,38 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         padding: EdgeInsets.zero,
         children: [
           Container(
-            height: 140,
+            height: 160,
             decoration: BoxDecoration(
               color: Color(0xFFD32F2F),
             ),
-            child: Padding(
-              padding: EdgeInsets.all(16),
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  SizedBox(height: 20),
                   CircleAvatar(
                     backgroundColor: Colors.white,
-                    radius: 24,
-                    child: Image.asset('assets/icon/logo.png', width: 32, height: 32),
+                    radius: 30,
+                    child: Icon(Icons.picture_as_pdf, size: 32, color: Color(0xFFD32F2F)),
                   ),
                   SizedBox(height: 12),
-                  Text('Dev Software', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-                  Text('PDF Reader - Görüntüleyici & Editör', style: TextStyle(fontSize: 12, color: Colors.white70)),
+                  Text(
+                    'Dev Software',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  SizedBox(height: 4),
+                  Text(
+                    'PDF Reader - Görüntüleyici & Editör',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.white70,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
                 ],
               ),
             ),
@@ -1393,10 +1344,10 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   Widget _buildThemeOption(String title, AppTheme theme, IconData icon) {
-    final isSelected = _themeManager.currentTheme == theme;
+    final isSelected = widget.themeManager.currentTheme == theme;
     
     return Card(
-      color: isSelected ? Color(0xFFFFEBEE) : Colors.white,
+      color: isSelected ? Color(0xFFFFEBEE) : Theme.of(context).cardColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
@@ -1408,11 +1359,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         leading: Icon(icon, color: isSelected ? Color(0xFFD32F2F) : Colors.grey),
         title: Text(title, style: TextStyle(
           fontWeight: FontWeight.w500,
-          color: isSelected ? Color(0xFFD32F2F) : Colors.black,
+          color: isSelected ? Color(0xFFD32F2F) : Theme.of(context).textTheme.bodyLarge?.color,
         )),
         trailing: isSelected ? Icon(Icons.check, color: Color(0xFFD32F2F)) : null,
         onTap: () {
-          _themeManager.setTheme(theme);
+          widget.themeManager.setTheme(theme);
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('$title teması uygulandı')),
@@ -1495,44 +1446,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
   }
 
   void _showLanguageSettings() {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Dil Ayarları', style: TextStyle(color: Color(0xFFD32F2F))),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ListTile(
-              leading: Icon(Icons.language, color: Color(0xFFD32F2F)),
-              title: Text('Uygulama Dili'),
-              subtitle: Text('Yakında eklenecek'),
-              onTap: () => _showComingSoon('Uygulama Dili'),
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.picture_as_pdf, color: Color(0xFFD32F2F)),
-              title: Text('PDF Görüntüleyici Dili'),
-              subtitle: Text('Yakında eklenecek'),
-              onTap: () => _showComingSoon('PDF Görüntüleyici Dili'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Kapat', style: TextStyle(color: Color(0xFFD32F2F))),
-          ),
-        ],
-      ),
-    );
+    _showComingSoon('Dil Ayarları');
   }
 
   void _showPrivacyPolicy() {
-    // Geçici olarak coming soon göster
     _showComingSoon('Gizlilik Politikası');
-    // Daha sonra buraya privacy policy URL'si eklenecek
-    // launchUrl(Uri.parse('PRIVACY_POLICY_URL'));
   }
 
   void _showAboutDialog() {
@@ -1641,7 +1559,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           ),
         ],
         IconButton(
-          icon: Image.asset('assets/icon/logo.png', width: 24, height: 24),
+          icon: Icon(Icons.menu, color: Colors.white),
           onPressed: () => _scaffoldKey.currentState?.openDrawer(),
         ),
       ],
@@ -1650,7 +1568,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               preferredSize: Size.fromHeight(48.0),
               child: Container(
                 color: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.grey[800] 
+                    ? Color(0xFF1E1E1E) 
                     : Colors.white,
                 child: TabBar(
                   controller: TabController(
@@ -1690,6 +1608,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       drawer: _buildDrawer(),
       body: TabBarView(
         controller: _tabController,
+        physics: _currentTabIndex == 0 
+            ? PageScrollPhysics() // Sadece Ana Sayfa'da kaydırma
+            : NeverScrollableScrollPhysics(), // Diğer tablarda kaydırma yok
         children: [
           _buildHomeTabContent(),
           _buildToolsTab(),
@@ -1703,6 +1624,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           _tabController.animateTo(index);
           setState(() => _currentTabIndex = index);
         },
+        backgroundColor: Theme.of(context).brightness == Brightness.dark 
+            ? Color(0xFF1E1E1E) 
+            : Colors.white,
+        selectedItemColor: Color(0xFFD32F2F),
+        unselectedItemColor: Theme.of(context).brightness == Brightness.dark 
+            ? Colors.grey[400] 
+            : Colors.grey,
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -1788,15 +1716,28 @@ class _ViewerScreenState extends State<ViewerScreen> {
             onPressed: () {
               if (widget.file != null) {
                 Share.shareFiles([widget.file!.path], text: 'PDF Dosyası');
+              } else if (widget.fileUri != null) {
+                Share.shareFiles([widget.fileUri!], text: 'PDF Dosyası');
               }
             },
           ),
           IconButton(
             icon: Icon(Icons.print),
             onPressed: () async {
-              if (widget.file != null) {
-                final data = await widget.file!.readAsBytes();
+              try {
+                Uint8List data;
+                if (widget.file != null) {
+                  data = await widget.file!.readAsBytes();
+                } else if (widget.fileUri != null) {
+                  data = await File(widget.fileUri!).readAsBytes();
+                } else {
+                  throw Exception('No file available for printing');
+                }
                 await Printing.layoutPdf(onLayout: (_) => data);
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Yazdırma hatası: $e')),
+                );
               }
             },
           ),
