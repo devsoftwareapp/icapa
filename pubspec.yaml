@@ -52,6 +52,8 @@ flutter:
     - assets/web/ocr.html
     - assets/web/pdf_res.html
     - assets/web/pdf_metin_ekle.html
+    - assets/web/organize.html
+    - assets/web/ekle_cikar.html
 
    #PDFjs zorunlu dosyalari
   
