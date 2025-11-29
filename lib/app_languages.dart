@@ -28,7 +28,7 @@ class AppLanguages {
     Language(code: 'de_DE', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪'),
     Language(code: 'zh_CN', name: 'Chinese', nativeName: '中文', flag: '🇨🇳'),
     Language(code: 'hi_IN', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳'),
-    Language(code: 'ar_SA', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦'),
+    Language(code: 'ar_AR', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦'),
     Language(code: 'ru_RU', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺'),
     Language(code: 'pt_BR', name: 'Portuguese', nativeName: 'Português', flag: '🇧🇷'),
     Language(code: 'id_ID', name: 'Indonesian', nativeName: 'Bahasa Indonesia', flag: '🇮🇩'),
