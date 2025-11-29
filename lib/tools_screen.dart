@@ -70,7 +70,7 @@ class ToolsScreen extends StatelessWidget {
         'onTap': () => _openToolWebView(context, 'PDF\'den Resme', 'pdf_res.html')
       },
       {
-        'icon': Icons.add_remove,
+        'icon': Icons.add_circle_outline, // DEĞİŞTİRİLDİ: add_remove yerine add_circle_outline
         'name': 'PDF Sayfa\nEkle & Çıkar',
         'color': const Color(0xFFE8EAF6),
         'onTap': () => _openToolWebView(context, 'PDF Sayfa Ekle & Çıkar', 'ekle_cikar.html')
