@@ -25,30 +25,27 @@ dependencies:
   connectivity_plus: ^5.0.0
   cached_network_image: ^3.3.0
   sqflite: ^2.3.0
-  shared_preferences: ^2.2.2  # EKLENDİ - Dil tercihleri için
-  flutter_localizations:        # EKLENDİ - Flutter localization desteği
+  shared_preferences: ^2.2.2
+  flutter_localizations:
     sdk: flutter
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.2
-  flutter_gen_runner: ^5.4.0  # EKLENDİ - ARB dosyalarından kod üretmek için
-
-flutter_icons:
-  image_path: "icon/icon.png"
-  android: true
-  adaptive_icon_background: "#ffffff"
-  adaptive_icon_foreground: "icon/icon.png"
+  flutter_gen_runner: ^5.4.0
+  build_runner: ^2.4.7
 
 flutter:
   uses-material-design: true
   
-  # Localization için ARB dosyalarını tanımla
-  generate: true  # EKLENDİ - flutter_gen etkinleştirildi
+  # Flutter gen konfigürasyonu
+  generate: true
+  flutter_gen:
+    output: lib/gen/
   
   assets:
-    # --- YENİ TOOLS HTML DOSYALARI ---
+    # --- TOOLS HTML DOSYALARI ---
     - assets/web/birlestirme.html
     - assets/web/imza.html
     - assets/web/res_pdf.html
@@ -58,21 +55,25 @@ flutter:
     - assets/web/pdf_res.html
     - assets/web/pdf_metin_ekle.html
     - assets/web/organize.html
-    - assets/web/sikistirma.html 
+    - assets/web/sikistirma.html
 
-   #PDFjs zorunlu dosyalari
+    # --- PDFjs DOSYALARI ---
     - assets/build/pdf.mjs
     - assets/build/pdf.worker.mjs
     - assets/web/viewer.css
     - assets/web/viewer.html
     - assets/web/viewer.mjs
     - assets/web/images/
+    
+    # --- ICON DOSYALARI ---
     - assets/icon/
     - assets/icon/logo.png
     - assets/icon/drive.png
     - assets/icon/onedrive.png
     - assets/icon/dropbox.png
     - assets/icon/gmail.png
+    
+    # --- LOCALE DOSYALARI ---
     - assets/web/locale/locale.json
     - assets/web/locale/af/
     - assets/web/locale/an/
