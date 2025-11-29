@@ -1,7 +1,6 @@
 {
   "@@locale": "ar_SA",
   
-  // App & General
   "appTitle": "قارئ PDF",
   "appSubtitle": "عارض ومحرر",
   "devSoftware": "Dev Software",
@@ -20,23 +19,19 @@
   "warning": "تحذير",
   "info": "معلومات",
   
-  // Main Tabs
   "home": "الرئيسية",
   "tools": "الأدوات", 
   "files": "الملفات",
   
-  // Home Sub Tabs
   "onDevice": "على الجهاز",
   "recent": "المؤخرات",
   "favorites": "المفضلة",
   
-  // Drawer Menu
   "about": "حول",
   "helpAndSupport": "المساعدة والدعم",
   "languages": "اللغات",
   "privacy": "الخصوصية",
   
-  // File Operations
   "fileSelection": "اختيار الملف",
   "pickFile": "اختر ملف",
   "scanAgain": "مسح مرة أخرى",
@@ -47,14 +42,12 @@
   "filePrinted": "تم طباعة الملف",
   "fileSaved": "تم حفظ الملف",
   
-  // Search & Filter
   "searchPdfs": "ابحث في ملفات PDF...",
   "searchHistory": "سجل البحث",
   "clearHistory": "مسح السجل",
   "noResults": "لم يتم العثور على نتائج",
   "searchResults": "نتائج البحث",
   
-  // Permissions
   "permissionRequired": "الإذن مطلوب",
   "fileAccessPermission": "إذن الوصول إلى الملفات",
   "grantPermission": "منح الإذن",
@@ -62,18 +55,15 @@
   "permissionDenied": "تم رفض الإذن",
   "permissionGranted": "تم منح الإذن",
   
-  // FAB Menu
   "selectFile": "اختر ملف",
   "scan": "مسح",
   "fromImage": "من صورة",
   
-  // Cloud Services
   "cloudStorage": "التخزين السحابي",
   "emailIntegration": "تكامل البريد الإلكتروني",
   "pdfsFromEmails": "ملفات PDF من البريد الإلكتروني",
   "browseForMoreFiles": "تصفح للمزيد من الملفات",
   
-  // Tools Screen
   "pdfMerger": "دمج PDF",
   "pdfSigner": "توقيع PDF", 
   "pdfCompressor": "ضغط PDF",
@@ -85,7 +75,6 @@
   "organizePages": "تنظيم الصفحات",
   "addImageToPdf": "إضافة صورة إلى PDF",
   
-  // Tool Loading States
   "toolLoading": "جاري تحميل الأداة...",
   "mergerLoading": "جاري تحميل أداة الدمج...",
   "signerLoading": "جاري تحميل أداة التوقيع...",
@@ -98,7 +87,6 @@
   "pageOrganizerLoading": "جاري تحميل منظم الصفحات...",
   "imageInserterLoading": "جاري تحميل أداة إدراج الصور...",
   
-  // Viewer Screen
   "pdfViewer": "عارض PDF",
   "pdfLoading": "جاري تحميل PDF...",
   "page": "صفحة",
@@ -109,14 +97,12 @@
   "fitToPage": "ملاءمة الصفحة",
   "actualSize": "الحجم الفعلي",
   
-  // About Dialog
   "aboutPdfReader": "حول قارئ PDF",
   "advancedPdfViewing": "تطبيق متقدم لعرض وإدارة ملفات PDF.",
   "technologiesUsed": "التقنيات المستخدمة",
   "licenseInfo": "معلومات الترخيص",
   "openSourceTechnologies": "تم تطوير هذا التطبيق باستخدام تقنيات مفتوحة المصدر.",
   
-  // Help & Support
   "helpSupport": "المساعدة والدعم",
   "describeIssue": "صف مشكلتك أو اقتراحك:",
   "yourEmail": "عنوان بريدك الإلكتروني",
@@ -125,7 +111,6 @@
   "fillAllFields": "يرجى ملء جميع الحقول",
   "messageRedirecting": "يتم إعادة توجيه رسالتك إلى تطبيق البريد الإلكتروني...",
   
-  // Language Settings
   "languageSettings": "إعدادات اللغة",
   "appLanguage": "لغة التطبيق",
   "pdfViewerLanguage": "لغة عارض PDF",
@@ -137,12 +122,10 @@
   "restartLater": "لاحقًا",
   "restartNow": "أعد التشغيل الآن",
   
-  // Privacy
   "privacyPolicy": "سياسة الخصوصية",
   "comingSoon": "قريبًا",
   "featureComingSoon": "هذه الميزة قادمة قريبًا! 🚀",
   
-  // Notifications & Alerts
   "pdfSavedSuccess": "تم حفظ PDF بنجاح",
   "pdfSaveError": "خطأ في حفظ PDF",
   "pdfOpenError": "خطأ في فتح PDF",
@@ -152,30 +135,25 @@
   "deleteError": "خطأ في الحذف",
   "permissionError": "خطأ في الإذن",
   
-  // Empty States
   "noPdfFiles": "لم يتم العثور على ملفات PDF",
   "noRecentFiles": "لا توجد ملفات حديثة حتى الآن",
   "noFavorites": "لا توجد مفضلات حتى الآن",
   "noSearchResults": "لم يتم العثور على نتائج بحث",
   
-  // File Info
   "fileSize": "حجم الملف",
   "modifiedDate": "تاريخ التعديل",
   "fileInfo": "معلومات الملف",
   
-  // Confirmation Dialogs
   "confirmDelete": "تأكيد الحذف",
   "deleteConfirmation": "هل أنت متأكد من أنك تريد حذف \"{fileName}\"؟ لا يمكن التراجع عن هذا الإجراء.",
   "confirmRename": "تأكيد إعادة التسمية",
   "newFileName": "اسم الملف الجديد",
   
-  // Cloud Service Names
   "googleDrive": "Google Drive",
   "oneDrive": "OneDrive", 
   "dropbox": "Dropbox",
   "gmail": "Gmail",
   
-  // Feature Tags
   "premium": "بريميوم",
   "new": "جديد",
   "popular": "شائع",
