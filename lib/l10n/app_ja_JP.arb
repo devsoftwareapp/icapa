@@ -1,0 +1,186 @@
+{
+  "@@locale": "ja_JP",
+  
+  // App & General
+  "appTitle": "PDFリーダー",
+  "appSubtitle": "ビューアー＆エディター",
+  "devSoftware": "Dev Software",
+  "version": "バージョン",
+  "close": "閉じる",
+  "cancel": "キャンセル",
+  "save": "保存",
+  "delete": "削除",
+  "share": "共有",
+  "print": "印刷",
+  "rename": "名前変更",
+  "search": "検索",
+  "loading": "読み込み中...",
+  "error": "エラー",
+  "success": "成功",
+  "warning": "警告",
+  "info": "情報",
+  
+  // Main Tabs
+  "home": "ホーム",
+  "tools": "ツール", 
+  "files": "ファイル",
+  
+  // Home Sub Tabs
+  "onDevice": "端末内",
+  "recent": "最近",
+  "favorites": "お気に入り",
+  
+  // Drawer Menu
+  "about": "約",
+  "helpAndSupport": "ヘルプとサポート",
+  "languages": "言語",
+  "privacy": "プライバシー",
+  
+  // File Operations
+  "fileSelection": "ファイル選択",
+  "pickFile": "ファイルを選択",
+  "scanAgain": "再スキャン",
+  "fileNotFound": "ファイルが見つかりません",
+  "fileDeleted": "ファイルを削除しました",
+  "fileRenamed": "ファイル名を変更しました",
+  "fileShared": "ファイルを共有しました",
+  "filePrinted": "ファイルを印刷しました",
+  "fileSaved": "ファイルを保存しました",
+  
+  // Search & Filter
+  "searchPdfs": "PDFを検索...",
+  "searchHistory": "検索履歴",
+  "clearHistory": "履歴をクリア",
+  "noResults": "結果が見つかりません",
+  "searchResults": "検索結果",
+  
+  // Permissions
+  "permissionRequired": "許可が必要です",
+  "fileAccessPermission": "ファイルアクセス許可",
+  "grantPermission": "許可する",
+  "goToSettings": "設定へ",
+  "permissionDenied": "許可が拒否されました",
+  "permissionGranted": "許可が付与されました",
+  
+  // FAB Menu
+  "selectFile": "ファイルを選択",
+  "scan": "スキャン",
+  "fromImage": "画像から",
+  
+  // Cloud Services
+  "cloudStorage": "クラウドストレージ",
+  "emailIntegration": "メール連携",
+  "pdfsFromEmails": "メールからのPDF",
+  "browseForMoreFiles": "さらにファイルを閲覧",
+  
+  // Tools Screen
+  "pdfMerger": "PDF結合",
+  "pdfSigner": "PDF署名", 
+  "pdfCompressor": "PDF圧縮",
+  "imageToPdf": "画像からPDF",
+  "textToSpeech": "音声読み上げ",
+  "ocrTextExtraction": "OCR文字抽出",
+  "pdfToImage": "PDFから画像",
+  "addTextToPdf": "PDFにテキスト追加",
+  "organizePages": "ページ整理",
+  "addImageToPdf": "PDFに画像追加",
+  
+  // Tool Loading States
+  "toolLoading": "ツールを読み込み中...",
+  "mergerLoading": "PDF結合ツールを読み込み中...",
+  "signerLoading": "PDF署名ツールを読み込み中...",
+  "compressorLoading": "PDF圧縮ツールを読み込み中...",
+  "imageConverterLoading": "画像変換ツールを読み込み中...",
+  "ttsLoading": "音声読み上げを読み込み中...",
+  "ocrLoading": "OCRを読み込み中...",
+  "pdfToImageLoading": "PDFから画像変換ツールを読み込み中...",
+  "textEditorLoading": "テキストエディターを読み込み中...",
+  "pageOrganizerLoading": "ページ整理ツールを読み込み中...",
+  "imageInserterLoading": "画像挿入ツールを読み込み中...",
+  
+  // Viewer Screen
+  "pdfViewer": "PDFビューアー",
+  "pdfLoading": "PDFを読み込み中...",
+  "page": "ページ",
+  "of": "/",
+  "zoomIn": "拡大",
+  "zoomOut": "縮小",
+  "fitToWidth": "幅に合わせる",
+  "fitToPage": "ページに合わせる",
+  "actualSize": "実際のサイズ",
+  
+  // About Dialog
+  "aboutPdfReader": "PDFリーダーについて",
+  "advancedPdfViewing": "高度なPDF表示および管理アプリケーション。",
+  "technologiesUsed": "使用技術",
+  "licenseInfo": "ライセンス情報",
+  "openSourceTechnologies": "このアプリケーションはオープンソース技術を使用して開発されています。",
+  
+  // Help & Support
+  "helpSupport": "ヘルプとサポート",
+  "describeIssue": "問題や提案を説明してください：",
+  "yourEmail": "メールアドレス",
+  "yourMessage": "メッセージ",
+  "send": "送信",
+  "fillAllFields": "すべてのフィールドを入力してください",
+  "messageRedirecting": "メッセージをメールアプリにリダイレクトしています...",
+  
+  // Language Settings
+  "languageSettings": "言語設定",
+  "appLanguage": "アプリ言語",
+  "pdfViewerLanguage": "PDFビューアー言語",
+  "systemLanguage": "システム言語（推奨）",
+  "deviceLanguage": "端末言語",
+  "changeLanguage": "言語を変更",
+  "languageChanged": "言語が変更されました",
+  "restartRequired": "変更を有効にするにはアプリの再起動が必要です",
+  "restartLater": "後で",
+  "restartNow": "今すぐ再起動",
+  
+  // Privacy
+  "privacyPolicy": "プライバシーポリシー",
+  "comingSoon": "近日公開",
+  "featureComingSoon": "この機能は近日公開予定です！🚀",
+  
+  // Notifications & Alerts
+  "pdfSavedSuccess": "PDFを正常に保存しました",
+  "pdfSaveError": "PDF保存エラー",
+  "pdfOpenError": "PDFオープンエラー",
+  "fileShareError": "ファイル共有エラー",
+  "printError": "印刷エラー",
+  "renameError": "名前変更エラー",
+  "deleteError": "削除エラー",
+  "permissionError": "許可エラー",
+  
+  // Empty States
+  "noPdfFiles": "PDFファイルが見つかりません",
+  "noRecentFiles": "最近のファイルはまだありません",
+  "noFavorites": "お気に入りはまだありません",
+  "noSearchResults": "検索結果が見つかりません",
+  
+  // File Info
+  "fileSize": "ファイルサイズ",
+  "modifiedDate": "更新日",
+  "fileInfo": "ファイル情報",
+  
+  // Confirmation Dialogs
+  "confirmDelete": "削除の確認",
+  "deleteConfirmation": "\"{fileName}\"を削除してもよろしいですか？この操作は元に戻せません。",
+  "confirmRename": "名前変更の確認",
+  "newFileName": "新しいファイル名",
+  
+  // Cloud Service Names
+  "googleDrive": "Google Drive",
+  "oneDrive": "OneDrive", 
+  "dropbox": "Dropbox",
+  "gmail": "Gmail",
+  
+  // Feature Tags
+  "premium": "プレミアム",
+  "new": "新着",
+  "popular": "人気",
+  
+  "@appTitle": {
+    "description": "アプリのメインタイトル"
+  }
+}
