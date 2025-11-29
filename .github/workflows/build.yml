@@ -37,9 +37,9 @@ jobs:
       - name: Flutter pub get
         run: flutter pub get
 
-      # 5️⃣ 🆕 ARB DOSYALARINDAN LOCALIZATION KODU ÜRET (YENİ EKLENDİ)
+      # 5️⃣ 🆕 ARB DOSYALARINDAN LOCALIZATION KODU ÜRET (DÜZELTİLDİ)
       - name: Generate localization code from ARB files
-        run: flutter pub run flutter_gen_runner build
+        run: flutter gen-l10n
 
       # 6️⃣ 📱 UYGULAMA İKONLARINI OLUŞTUR
       - name: Generate app icons
@@ -59,7 +59,7 @@ jobs:
           storePassword=$KEYSTORE_PASSWORD
           keyPassword=$KEY_PASSWORD
           keyAlias=$KEY_ALIAS
-          storeFile=../keystore.jks
+          storeFile=keystore.jks
           EOF
 
       # 9️⃣ 🏗️ IMZALI RELEASE APK (SADECE ARM64)
