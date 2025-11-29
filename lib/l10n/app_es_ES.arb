@@ -1,0 +1,213 @@
+{
+  "@@locale": "es_ES",
+  
+  // App & General
+  "appTitle": "Lector PDF",
+  "appSubtitle": "Visor & Editor",
+  "devSoftware": "Dev Software",
+  "version": "Versión",
+  "close": "Cerrar",
+  "cancel": "Cancelar",
+  "save": "Guardar",
+  "delete": "Eliminar",
+  "share": "Compartir",
+  "print": "Imprimir",
+  "rename": "Renombrar",
+  "search": "Buscar",
+  "loading": "Cargando...",
+  "error": "Error",
+  "success": "Éxito",
+  "warning": "Advertencia",
+  "info": "Información",
+  
+  // Main Tabs
+  "home": "Inicio",
+  "tools": "Herramientas", 
+  "files": "Archivos",
+  
+  // Home Sub Tabs
+  "onDevice": "En Dispositivo",
+  "recent": "Recientes",
+  "favorites": "Favoritos",
+  
+  // Drawer Menu
+  "about": "Acerca de",
+  "helpAndSupport": "Ayuda y Soporte",
+  "languages": "Idiomas",
+  "privacy": "Privacidad",
+  
+  // File Operations
+  "fileSelection": "Selección de Archivo",
+  "pickFile": "Seleccionar Archivo",
+  "scanAgain": "Escanear de Nuevo",
+  "fileNotFound": "Archivo No Encontrado",
+  "fileDeleted": "Archivo Eliminado",
+  "fileRenamed": "Archivo Renombrado",
+  "fileShared": "Archivo Compartido",
+  "filePrinted": "Archivo Impreso",
+  "fileSaved": "Archivo Guardado",
+  
+  // Search & Filter
+  "searchPdfs": "Buscar en PDFs...",
+  "searchHistory": "Historial de Búsqueda",
+  "clearHistory": "Limpiar Historial",
+  "noResults": "No Se Encontraron Resultados",
+  "searchResults": "Resultados de Búsqueda",
+  
+  // Permissions
+  "permissionRequired": "Permiso Requerido",
+  "fileAccessPermission": "Permiso de Acceso a Archivos",
+  "grantPermission": "Conceder Permiso",
+  "goToSettings": "Ir a Configuración",
+  "permissionDenied": "Permiso Denegado",
+  "permissionGranted": "Permiso Concedido",
+  
+  // FAB Menu
+  "selectFile": "Seleccionar Archivo",
+  "scan": "Escanear",
+  "fromImage": "Desde Imagen",
+  
+  // Cloud Services
+  "cloudStorage": "Almacenamiento en la Nube",
+  "emailIntegration": "Integración de Correo",
+  "pdfsFromEmails": "PDFs de Correos Electrónicos",
+  "browseForMoreFiles": "Explorar para Más Archivos",
+  
+  // Tools Screen
+  "pdfMerger": "Combinar PDF",
+  "pdfSigner": "Firmar PDF", 
+  "pdfCompressor": "Comprimir PDF",
+  "imageToPdf": "Imagen a PDF",
+  "textToSpeech": "Texto a Voz",
+  "ocrTextExtraction": "Extracción de Texto OCR",
+  "pdfToImage": "PDF a Imagen",
+  "addTextToPdf": "Agregar Texto a PDF",
+  "organizePages": "Organizar Páginas",
+  "addImageToPdf": "Agregar Imagen a PDF",
+  
+  // Tool Loading States
+  "toolLoading": "Herramienta Cargando...",
+  "mergerLoading": "Combinador PDF Cargando...",
+  "signerLoading": "Firmador PDF Cargando...",
+  "compressorLoading": "Compresor PDF Cargando...",
+  "imageConverterLoading": "Convertidor de Imagen Cargando...",
+  "ttsLoading": "Texto a Voz Cargando...",
+  "ocrLoading": "OCR Cargando...",
+  "pdfToImageLoading": "Convertidor PDF a Imagen Cargando...",
+  "textEditorLoading": "Editor de Texto Cargando...",
+  "pageOrganizerLoading": "Organizador de Páginas Cargando...",
+  "imageInserterLoading": "Insertador de Imagen Cargando...",
+  
+  // Viewer Screen
+  "pdfViewer": "Visor PDF",
+  "pdfLoading": "PDF Cargando...",
+  "page": "Página",
+  "of": "de",
+  "zoomIn": "Acercar",
+  "zoomOut": "Alejar",
+  "fitToWidth": "Ajustar al Ancho",
+  "fitToPage": "Ajustar a la Página",
+  "actualSize": "Tamaño Real",
+  
+  // About Dialog
+  "aboutPdfReader": "Acerca de Lector PDF",
+  "advancedPdfViewing": "Aplicación avanzada de visualización y gestión de PDF.",
+  "technologiesUsed": "Tecnologías Utilizadas",
+  "licenseInfo": "Información de Licencia",
+  "openSourceTechnologies": "Esta aplicación se desarrolla utilizando tecnologías de código abierto.",
+  
+  // Help & Support
+  "helpSupport": "Ayuda y Soporte",
+  "describeIssue": "Describa su problema o sugerencia:",
+  "yourEmail": "Su Dirección de Correo",
+  "yourMessage": "Su Mensaje",
+  "send": "Enviar",
+  "fillAllFields": "Por favor complete todos los campos",
+  "messageRedirecting": "Su mensaje se está redirigiendo a la aplicación de correo...",
+  
+  // Language Settings
+  "languageSettings": "Configuración de Idioma",
+  "appLanguage": "Idioma de la App",
+  "pdfViewerLanguage": "Idioma del Visor PDF",
+  "systemLanguage": "Idioma del Sistema (Recomendado)",
+  "deviceLanguage": "Idioma del Dispositivo",
+  "changeLanguage": "Cambiar Idioma",
+  "languageChanged": "Idioma cambiado",
+  "restartRequired": "Se requiere reiniciar la aplicación para que los cambios surtan efecto",
+  "restartLater": "Más Tarde",
+  "restartNow": "Reiniciar Ahora",
+  
+  // Privacy
+  "privacyPolicy": "Política de Privacidad",
+  "comingSoon": "Próximamente",
+  "featureComingSoon": "¡Esta función llegará pronto! 🚀",
+  
+  // Notifications & Alerts
+  "pdfSavedSuccess": "PDF guardado exitosamente",
+  "pdfSaveError": "Error al guardar PDF",
+  "pdfOpenError": "Error al abrir PDF",
+  "fileShareError": "Error al compartir archivo",
+  "printError": "Error de impresión",
+  "renameError": "Error al renombrar",
+  "deleteError": "Error al eliminar",
+  "permissionError": "Error de permiso",
+  
+  // Empty States
+  "noPdfFiles": "No se encontraron archivos PDF",
+  "noRecentFiles": "Aún no hay archivos recientes",
+  "noFavorites": "Aún no hay favoritos",
+  "noSearchResults": "No se encontraron resultados de búsqueda",
+  
+  // File Info
+  "fileSize": "Tamaño del Archivo",
+  "modifiedDate": "Fecha de Modificación",
+  "fileInfo": "Información del Archivo",
+  
+  // Confirmation Dialogs
+  "confirmDelete": "Confirmar Eliminación",
+  "deleteConfirmation": "¿Está seguro de que desea eliminar \"{fileName}\"? Esta acción no se puede deshacer.",
+  "confirmRename": "Confirmar Renombrado",
+  "newFileName": "Nuevo nombre de archivo",
+  
+  // Cloud Service Names
+  "googleDrive": "Google Drive",
+  "oneDrive": "OneDrive", 
+  "dropbox": "Dropbox",
+  "gmail": "Gmail",
+  
+  // Feature Tags
+  "premium": "Premium",
+  "new": "Nuevo",
+  "popular": "Popular",
+  
+  "@appTitle": {
+    "description": "Título principal de la aplicación"
+  },
+  "@home": {
+    "description": "Título de pestaña de inicio"
+  },
+  "@tools": {
+    "description": "Título de pestaña de herramientas"
+  },
+  "@files": {
+    "description": "Título de pestaña de archivos"
+  },
+  "@searchPdfs": {
+    "description": "Texto de placeholder del campo de búsqueda"
+  },
+  "@pdfViewer": {
+    "description": "Título de pantalla del visor PDF"
+  },
+  "@about": {
+    "description": "Sección acerca de en el drawer"
+  },
+  "@helpAndSupport": {
+    "description": "Sección de ayuda y soporte"
+  },
+  "@languages": {
+    "description": "Configuración de idiomas"
+  },
+  "@privacy": {
+    "description": "Política de privacidad"
+  }
+}
