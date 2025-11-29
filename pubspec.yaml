@@ -36,14 +36,16 @@ dev_dependencies:
   flutter_gen_runner: ^5.4.0
   build_runner: ^2.4.7
 
+# --- BURASI ÖNEMLİ: flutter_gen BURAYA ALINDI ---
+flutter_gen:
+  output: lib/gen/
+
 flutter:
   uses-material-design: true
-  
-  # Flutter gen konfigürasyonu
+
+  # Flutter'ın kendi sınıf üretme sistemi
   generate: true
-  flutter_gen:
-    output: lib/gen/
-  
+
   assets:
     # --- TOOLS HTML DOSYALARI ---
     - assets/web/birlestirme.html
@@ -64,7 +66,7 @@ flutter:
     - assets/web/viewer.html
     - assets/web/viewer.mjs
     - assets/web/images/
-    
+
     # --- ICON DOSYALARI ---
     - assets/icon/
     - assets/icon/logo.png
@@ -72,7 +74,7 @@ flutter:
     - assets/icon/onedrive.png
     - assets/icon/dropbox.png
     - assets/icon/gmail.png
-    
+
     # --- LOCALE DOSYALARI ---
     - assets/web/locale/locale.json
     - assets/web/locale/af/
