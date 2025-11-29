@@ -59,6 +59,17 @@ class ThemeManager with ChangeNotifier {
     }
   }
 
+  Color get primaryColor {
+    switch (_currentTheme) {
+      case AppTheme.blue: return Color(0xFF1976D2);
+      case AppTheme.green: return Color(0xFF388E3C);
+      case AppTheme.purple: return Color(0xFF7B1FA2);
+      case AppTheme.orange: return Color(0xFFF57C00);
+      case AppTheme.red: return Color(0xFFD32F2F);
+      default: return Color(0xFFD32F2F);
+    }
+  }
+
   static final ThemeData _redTheme = ThemeData(
     primarySwatch: Colors.red,
     primaryColor: Color(0xFFD32F2F),
@@ -174,27 +185,49 @@ void main() async {
   
   final initialIntent = await _getInitialIntent();
   
-  runApp(MyApp(initialIntent: initialIntent));
+  runApp(PdfManagerApp(initialIntent: initialIntent));
 }
 
-class MyApp extends StatelessWidget {
+class PdfManagerApp extends StatelessWidget {
   final Map<String, dynamic>? initialIntent;
 
-  const MyApp({super.key, this.initialIntent});
+  const PdfManagerApp({super.key, this.initialIntent});
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => ThemeManager(),
-      child: Consumer<ThemeManager>(
-        builder: (context, themeManager, child) {
-          return MaterialApp(
-            title: 'PDF Reader',
-            theme: themeManager.themeData,
-            home: HomePage(initialIntent: initialIntent),
-          );
-        },
+    return MaterialApp(
+      title: 'PDF Reader',
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        primaryColor: Color(0xFFD32F2F),
+        scaffoldBackgroundColor: Colors.white,
+        appBarTheme: AppBarTheme(
+          backgroundColor: Color(0xFFD32F2F),
+          foregroundColor: Colors.white,
+          elevation: 2,
+          titleTextStyle: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        floatingActionButtonTheme: FloatingActionButtonThemeData(
+          backgroundColor: Color(0xFFD32F2F),
+          foregroundColor: Colors.white,
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          selectedItemColor: Color(0xFFD32F2F),
+          unselectedItemColor: Colors.grey,
+        ),
+        tabBarTheme: TabBarTheme(
+          labelColor: Color(0xFFD32F2F),
+          unselectedLabelColor: Colors.grey,
+          indicator: UnderlineTabIndicator(
+            borderSide: BorderSide(width: 2.0, color: Color(0xFFD32F2F)),
+          ),
+        ),
       ),
+      home: HomePage(initialIntent: initialIntent),
     );
   }
 }
@@ -226,6 +259,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   // Veritabanı için
   Database? _database;
+
+  // Tema yöneticisi
+  final ThemeManager _themeManager = ThemeManager();
 
   // Tab başlıkları
   final List<String> _tabTitles = ['Ana Sayfa', 'Araçlar', 'Dosyalar'];
@@ -1422,8 +1458,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             itemCount: AppTheme.values.length,
             itemBuilder: (context, index) {
               final theme = AppTheme.values[index];
-              final themeManager = Provider.of<ThemeManager>(context, listen: false);
-              final isSelected = themeManager.currentTheme == theme;
+              final isSelected = _themeManager.currentTheme == theme;
               
               Color getThemeColor() {
                 switch (theme) {
@@ -1459,7 +1494,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
                 child: InkWell(
                   borderRadius: BorderRadius.circular(12),
                   onTap: () {
-                    themeManager.setTheme(theme);
+                    _themeManager.setTheme(theme);
                     Navigator.pop(context);
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('$getThemeName tema uygulandı')),
@@ -1671,7 +1706,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildSearchAppBar() {
+  PreferredSizeWidget _buildSearchAppBar() {
     return AppBar(
       backgroundColor: Color(0xFFD32F2F),
       foregroundColor: Colors.white,
@@ -1706,7 +1741,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     );
   }
 
-  Widget _buildNormalAppBar() {
+  PreferredSizeWidget _buildNormalAppBar() {
     return AppBar(
       title: Text(_tabTitles[_currentTabIndex]),
       actions: [
@@ -1830,12 +1865,10 @@ class _ViewerScreenState extends State<ViewerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final themeManager = Provider.of<ThemeManager>(context);
-    
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.fileName, style: TextStyle(fontSize: 16)),
-        backgroundColor: themeManager.themeData.primaryColor,
+        backgroundColor: Color(0xFFD32F2F),
         foregroundColor: Colors.white,
         actions: [
           IconButton(
@@ -1863,7 +1896,7 @@ class _ViewerScreenState extends State<ViewerScreen> {
             LinearProgressIndicator(
               value: _progress,
               backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(themeManager.themeData.primaryColor),
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFD32F2F)),
             ),
           Expanded(
             child: Stack(
@@ -1894,9 +1927,9 @@ class _ViewerScreenState extends State<ViewerScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        CircularProgressIndicator(color: themeManager.themeData.primaryColor),
+                        CircularProgressIndicator(color: Color(0xFFD32F2F)),
                         SizedBox(height: 20),
-                        Text('PDF Yükleniyor...', style: TextStyle(color: themeManager.themeData.primaryColor)),
+                        Text('PDF Yükleniyor...', style: TextStyle(color: Color(0xFFD32F2F))),
                       ],
                     ),
                   ),
