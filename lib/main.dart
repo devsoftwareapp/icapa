@@ -1,5 +1,6 @@
 // lib/main.dart
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:path/path.dart' as p;
@@ -1738,6 +1739,54 @@ class _ViewerScreenState extends State<ViewerScreen> {
     }
   }
 
+  // PDF kaydetme işlevi
+  Future<void> _savePdf(String filename, String base64Data) async {
+    try {
+      // Base64 veriyi decode et
+      final bytes = base64.decode(base64Data);
+      
+      // Kaydetme dizinini oluştur
+      final downloadDir = Directory('/storage/emulated/0/Download/PDF Reader');
+      if (!await downloadDir.exists()) {
+        await downloadDir.create(recursive: true);
+      }
+      
+      // Yeni dosya adını oluştur (Saved_ öneki ile)
+      String originalName = widget.fileName;
+      if (originalName.toLowerCase().endsWith('.pdf')) {
+        originalName = originalName.substring(0, originalName.length - 4);
+      }
+      final newFileName = 'Saved_$originalName.pdf';
+      final filePath = '${downloadDir.path}/$newFileName';
+      
+      // Dosyayı kaydet
+      final file = File(filePath);
+      await file.writeAsBytes(bytes);
+      
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PDF kaydedildi: $newFileName'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+      
+      print('PDF saved to: $filePath');
+      
+    } catch (e) {
+      print('PDF kaydetme hatası: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('PDF kaydedilirken hata: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1793,6 +1842,21 @@ class _ViewerScreenState extends State<ViewerScreen> {
                     allowUniversalAccessFromFileURLs: true,
                     supportZoom: true,
                   ),
+                  onWebViewCreated: (controller) {
+                    _controller = controller;
+                    
+                    // JavaScript handler'ı ekle
+                    controller.addJavaScriptHandler(
+                      handlerName: 'onPdfSaved',
+                      callback: (args) {
+                        if (args.length >= 2) {
+                          final filename = args[0] as String;
+                          final base64Data = args[1] as String;
+                          _savePdf(filename, base64Data);
+                        }
+                      },
+                    );
+                  },
                   onProgressChanged: (controller, progress) {
                     setState(() {
                       _progress = progress / 100;
