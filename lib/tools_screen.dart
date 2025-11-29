@@ -1,555 +1,20 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 
-// Gerekli Olan Ancak Eksik Olan Import
-import 'package:device_info_plus/device_info_plus.dart'; 
-
-// PDF ve Görüntü İşleme Paketleri
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:image_picker/image_picker.dart';
-import 'package:image/image.dart' as img;
-
-// TTS (Sesli Okuma) Paketleri
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:read_pdf_text/read_pdf_text.dart';
-
-// Diğer Yardımcı Paketler
-import 'package:open_file/open_file.dart';
-import 'package:permission_handler/permission_handler.dart';
-
-// =========================================================================
-// YARDIMCI SINIFLAR (PDF İşlemleri, TTS, Dosya Kaydetme)
-// =========================================================================
-
-/// Basit bir snackbar göstericisi
-void _showSnackbar(BuildContext context, String message, {Color color = const Color(0xFFD32F2F)}) {
-  if (context.mounted) {
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: color,
-        duration: const Duration(seconds: 3),
-      ),
-    );
-  }
-}
-
-/// Sesli Okuma Kontrol Paneli
-class TtsControlPanel extends StatefulWidget {
-  final TtsService ttsService;
-  final VoidCallback onClose;
-
-  const TtsControlPanel({
-    super.key,
-    required this.ttsService,
-    required this.onClose,
-  });
-
-  @override
-  State<TtsControlPanel> createState() => _TtsControlPanelState();
-}
-
-class _TtsControlPanelState extends State<TtsControlPanel> {
-  double _speechRate = 0.5;
-  final List<double> _speechRates = [0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0];
-  final Map<double, String> _rateLabels = {
-    0.25: '0.25x',
-    0.5: '0.5x',
-    0.75: '0.75x',
-    1.0: '1x',
-    1.25: '1.25x',
-    1.5: '1.5x',
-    1.75: '1.75x',
-    2.0: '2x',
-  };
-
-  @override
-  void initState() {
-    super.initState();
-    _loadCurrentSpeechRate();
-  }
-
-  Future<void> _loadCurrentSpeechRate() async {
-    // FlutterTts'de getSpeechRate getter'ı yok, bu yüzden varsayılan değer kullanıyoruz
-    // Veya bir callback ile mevcut değeri alabiliriz
-    setState(() {
-      _speechRate = 0.5; // Varsayılan değer
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.black.withOpacity(0.8),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(20),
-          topRight: Radius.circular(20),
-        ),
-      ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Kontrol Butonları
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              // Geri Sar
-              IconButton(
-                onPressed: () {
-                  _showSnackbar(context, "Geri sarma özelliği yakında eklenecek", color: Colors.orange);
-                },
-                icon: const Icon(Icons.replay_10, color: Colors.white, size: 30),
-              ),
-              
-              // Oynat/Durdur
-              Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD32F2F),
-                  shape: BoxShape.circle,
-                ),
-                child: IconButton(
-                  onPressed: () {
-                    if (widget.ttsService.isPlaying) {
-                      widget.ttsService.pause();
-                    } else {
-                      widget.ttsService.speak(); // resume yerine speak kullan
-                    }
-                  },
-                  icon: Icon(
-                    widget.ttsService.isPlaying ? Icons.pause : Icons.play_arrow,
-                    color: Colors.white,
-                    size: 35,
-                  ),
-                ),
-              ),
-              
-              // İleri Sar
-              IconButton(
-                onPressed: () {
-                  _showSnackbar(context, "İleri sarma özelliği yakında eklenecek", color: Colors.orange);
-                },
-                icon: const Icon(Icons.forward_10, color: Colors.white, size: 30),
-              ),
-              
-              // Kapat
-              IconButton(
-                onPressed: widget.onClose,
-                icon: const Icon(Icons.close, color: Colors.white, size: 30),
-              ),
-            ],
-          ),
-          
-          const SizedBox(height: 16),
-          
-          // Hız Seçenekleri
-          Text(
-            'Okuma Hızı',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          
-          const SizedBox(height: 8),
-          
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: _speechRates.map((rate) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: ChoiceChip(
-                    label: Text(
-                      _rateLabels[rate]!,
-                      style: TextStyle(
-                        color: _speechRate == rate ? Colors.white : Colors.black,
-                      ),
-                    ),
-                    selected: _speechRate == rate,
-                    selectedColor: const Color(0xFFD32F2F),
-                    backgroundColor: Colors.white,
-                    onSelected: (selected) {
-                      setState(() {
-                        _speechRate = rate;
-                      });
-                      widget.ttsService.setSpeechRate(rate);
-                    },
-                  ),
-                );
-              }).toList(),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// PDF Dosya İşlemleri İçin Servis Sınıfı
-class PdfService {
-  final BuildContext context;
-
-  PdfService(this.context);
-
-  /// İzinleri kontrol eder ve Android 13+ için özel olarak ele alır.
-  Future<bool> _requestPermission() async {
-    if (Platform.isAndroid) {
-      final androidInfo = await DeviceInfoPlugin().androidInfo;
-      if (androidInfo.version.sdkInt >= 33) {
-        final status = await Permission.photos.request();
-        final statusVideos = await Permission.videos.request();
-        return status.isGranted && statusVideos.isGranted;
-      }
-    }
-    final status = await Permission.storage.request();
-    return status.isGranted;
-  }
-
-  /// PDF dosyasını belirtilen klasöre kaydeder ve açar.
-  Future<void> _saveAndOpenPdf(Uint8List bytes, String fileName) async {
-    try {
-      if (!await _requestPermission()) {
-        _showSnackbar(context, "Dosya kaydetme izni verilmedi.", color: Colors.orange);
-        return;
-      }
-
-      final dir = await getExternalStorageDirectory();
-      if (dir == null) {
-        _showSnackbar(context, "Cihaz depolama dizini bulunamadı.", color: Colors.red);
-        return;
-      }
-
-      final appDir = Directory(p.join(dir.path, 'Download', 'PDF Reader'));
-      if (!await appDir.exists()) {
-        await appDir.create(recursive: true);
-      }
-
-      final file = File(p.join(appDir.path, fileName));
-      await file.writeAsBytes(bytes);
-
-      _showSnackbar(context, 'Başarılı: $fileName kaydedildi! Klasör: ${appDir.path}', color: Colors.green);
-      
-      await OpenFile.open(file.path);
-
-    } catch (e) {
-      _showSnackbar(context, 'Hata: PDF kaydedilemedi veya açılamadı. Hata: $e', color: Colors.red);
-    }
-  }
-
-  /// 1. ÖZELLİK: Görselleri Seçip PDF Oluşturur
-  Future<void> createPdfFromImages() async {
-    _showSnackbar(context, "Görseller seçiliyor...", color: Colors.blueGrey);
-    try {
-      final pickedFiles = await ImagePicker().pickMultiImage();
-      if (pickedFiles == null || pickedFiles.isEmpty) {
-        _showSnackbar(context, "Görsel seçimi iptal edildi.", color: Colors.orange);
-        return;
-      }
-
-      final doc = pw.Document();
-
-      for (var pickedFile in pickedFiles) {
-        final imageFile = File(pickedFile.path);
-        final imageBytes = await imageFile.readAsBytes();
-        
-        final image = img.decodeImage(imageBytes);
-
-        if (image != null) {
-          final pdfImage = pw.MemoryImage(imageBytes);
-          
-          doc.addPage(
-            pw.Page(
-              pageFormat: PdfPageFormat.a4,
-              build: (pw.Context context) {
-                return pw.Center(
-                  child: pw.Image(pdfImage),
-                );
-              },
-            ),
-          );
-        }
-      }
-
-      if (pickedFiles.isNotEmpty) { 
-        final bytes = await doc.save();
-        final fileName = 'GorseldenPDF_${DateTime.now().millisecondsSinceEpoch}.pdf';
-        await _saveAndOpenPdf(bytes, fileName);
-      } else {
-        _showSnackbar(context, "Seçilen görsellerden PDF oluşturulamadı.", color: Colors.red);
-      }
-    } catch (e) {
-      _showSnackbar(context, 'Hata: Görselden PDF oluşturulurken bir sorun oluştu. $e', color: Colors.red);
-    }
-  }
-
-  /// 2. ÖZELLİK: Birden Fazla PDF Dosyasını Birleştirir - DÜZELTİLDİ
-  Future<void> mergePdfs() async {
-    _showSnackbar(context, "Birleştirilecek PDF'ler seçiliyor...", color: Colors.blueGrey);
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-        allowMultiple: true,
-      );
-
-      if (result == null || result.files.length < 2) {
-        _showSnackbar(context, "Birleştirme için en az 2 PDF dosyası seçmelisiniz.", color: Colors.orange);
-        return;
-      }
-
-      final doc = pw.Document();
-      int totalPages = 0;
-
-      for (var file in result.files) {
-        final pdfBytes = file.bytes;
-        if (pdfBytes != null) {
-          try {
-            // Basit bir birleştirme: Her dosya için bir sayfa oluştur
-            doc.addPage(
-              pw.Page(
-                pageFormat: PdfPageFormat.a4,
-                build: (pw.Context context) {
-                  return pw.Center(
-                    child: pw.Column(
-                      mainAxisAlignment: pw.MainAxisAlignment.center,
-                      children: [
-                        pw.Text(
-                          'Dosya: ${file.name}',
-                          style: pw.TextStyle(fontSize: 20, fontWeight: pw.FontWeight.bold),
-                        ),
-                        pw.SizedBox(height: 20),
-                        pw.Text(
-                          'Sayfa ${totalPages + 1}',
-                          style: pw.TextStyle(fontSize: 16),
-                        ),
-                        pw.SizedBox(height: 10),
-                        pw.Text(
-                          'Bu özellik geliştirme aşamasındadır',
-                          style: pw.TextStyle(fontSize: 12, color: PdfColors.grey),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            );
-            totalPages++;
-          } catch (e) {
-            _showSnackbar(context, 'PDF işlenirken hata: ${file.name}', color: Colors.orange);
-          }
-        }
-      }
-      
-      if (totalPages > 0) {
-        final bytes = await doc.save();
-        final fileName = 'BirlestirilmisPDF_${DateTime.now().millisecondsSinceEpoch}.pdf';
-        await _saveAndOpenPdf(bytes, fileName);
-      } else {
-        _showSnackbar(context, "Seçilen dosyalardan sayfa alınamadı.", color: Colors.red);
-      }
-
-    } catch (e) {
-      _showSnackbar(context, 'Hata: Dosyalar birleştirilirken bir sorun oluştu. $e', color: Colors.red);
-    }
-  }
-}
-
-/// TTS (Sesli Okuma) İşlemleri İçin Servis Sınıfı
-class TtsService {
-  final FlutterTts flutterTts = FlutterTts();
-  final BuildContext context;
-  bool isPlaying = false;
-  bool showControlPanel = false;
-  String? _currentText;
-
-  TtsService(this.context) {
-    _initTts();
-  }
-
-  void _initTts() {
-    flutterTts.setLanguage("tr-TR");
-    flutterTts.setSpeechRate(0.5);
-    
-    flutterTts.setCompletionHandler(() {
-      if (context.mounted) {
-        _updateState(() {
-          isPlaying = false;
-          showControlPanel = false;
-        });
-      }
-    });
-
-    flutterTts.setErrorHandler((msg) {
-      _showSnackbar(context, 'TTS Hatası: $msg', color: Colors.red);
-      if (context.mounted) {
-        _updateState(() {
-          isPlaying = false;
-          showControlPanel = false;
-        });
-      }
-    });
-  }
-
-  void _updateState(VoidCallback fn) {
-    if (context.mounted) {
-      final state = context.findAncestorStateOfType<_ToolsScreenState>();
-      state?.setState(fn);
-    }
-  }
-
-  void setSpeechRate(double rate) {
-    flutterTts.setSpeechRate(rate);
-  }
-
-  Future<void> pause() async {
-    await flutterTts.pause();
-    _updateState(() {
-      isPlaying = false;
-    });
-  }
-
-  Future<void> speak() async {
-    if (_currentText != null) {
-      await flutterTts.speak(_currentText!);
-      _updateState(() {
-        isPlaying = true;
-      });
-    }
-  }
-
-  Future<void> stop() async {
-    await flutterTts.stop();
-    _updateState(() {
-      isPlaying = false;
-      showControlPanel = false;
-    });
-  }
-
-  void toggleControlPanel() {
-    _updateState(() {
-      showControlPanel = !showControlPanel;
-    });
-  }
-
-  void hideControlPanel() {
-    _updateState(() {
-      showControlPanel = false;
-    });
-  }
-
-  /// PDF'ten metni çeker ve okumaya başlar.
-  Future<void> speakPdf() async {
-    if (isPlaying) {
-      // Eğer zaten çalışıyorsa, kontrol panelini göster/gizle
-      toggleControlPanel();
-      return;
-    }
-
-    _showSnackbar(context, "Okunacak PDF dosyası seçiliyor...", color: Colors.blueGrey);
-
-    try {
-      final result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['pdf'],
-        allowMultiple: false,
-      );
-
-      final pdfPath = result?.files.single.path;
-
-      if (pdfPath == null) {
-        _showSnackbar(context, "PDF seçimi iptal edildi.", color: Colors.orange);
-        return;
-      }
-
-      _showSnackbar(context, "Metin PDF'ten çıkarılıyor, lütfen bekleyin...", color: Colors.blue);
-
-      String text = await ReadPdfText.getPDFtext(pdfPath); 
-      
-      if (text.trim().isEmpty) {
-        _showSnackbar(context, "PDF'ten okunabilir metin çıkarılamadı. Dosya şifreli olabilir veya sadece resim içerebilir.", color: Colors.orange);
-        return;
-      }
-      
-      // Metni sakla
-      _currentText = text;
-      
-      // Metin okuma
-      int resultTts = await flutterTts.speak(text);
-      if (resultTts == 1) {
-        _updateState(() {
-          isPlaying = true;
-          showControlPanel = true;
-        });
-        _showSnackbar(context, "Sesli okuma başlatıldı. Kontrol paneli açıldı.", color: Colors.green);
-      } else {
-        _showSnackbar(context, "Sesli okuma başlatılamadı.", color: Colors.red);
-      }
-
-    } catch (e) {
-      _showSnackbar(context, 'Hata: Sesli okuma sırasında sorun oluştu. $e', color: Colors.red);
-    }
-  }
-
-  /// Uygulama kapatılırken TTS motorunu durdurmak için
-  void dispose() {
-    flutterTts.stop();
-  }
-}
-
-// =========================================================================
-// WIDGET
-// =========================================================================
-
-class ToolsScreen extends StatefulWidget {
+class ToolsScreen extends StatelessWidget {
   final VoidCallback onPickFile;
-  final Function(String) onOpenViewer; // YENİ: onOpenViewer parametresi eklendi
 
   const ToolsScreen({
     super.key, 
     required this.onPickFile,
-    required this.onOpenViewer, // YENİ: onOpenViewer parametresi eklendi
   });
 
-  @override
-  State<ToolsScreen> createState() => _ToolsScreenState();
-}
-
-class _ToolsScreenState extends State<ToolsScreen> {
-  late PdfService _pdfService;
-  late TtsService _ttsService;
-
-  @override
-  void initState() {
-    super.initState();
-    _pdfService = PdfService(context);
-    _ttsService = TtsService(context); 
-  }
-
-  @override
-  void dispose() {
-    _ttsService.dispose();
-    super.dispose();
-  }
-
-  // PDF Doldur & İmzala için geçici yer tutucu
-  void _showSignaturePad() {
-    _showSnackbar(context, "İmza atma paneli yükleniyor...", color: Colors.blueGrey);
-    _showSnackbar(context, "Bu özellik için özel bir imza ekranı ve imzanın PDF üzerine yerleştirilmesi mantığı gereklidir. (Yakında) ✍️", color: Colors.orange);
-  }
-
-  // Yakında Eklenecek Özellikler için geçici uyarı
-  void _showComingSoon(String feature) {
-    _showSnackbar(context, '$feature - Yakında eklenecek! 🚀', color: const Color(0xFFD32F2F));
+  void _showComingSoon(BuildContext context, String feature) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('$feature - Yakında eklenecek! 🚀'),
+        backgroundColor: const Color(0xFFD32F2F),
+      ),
+    );
   }
 
   @override
@@ -559,136 +24,88 @@ class _ToolsScreenState extends State<ToolsScreen> {
         'icon': Icons.edit,
         'name': 'PDF Düzenle',
         'color': const Color(0xFFFFEBEE),
-        'onTap': () => _showComingSoon('PDF Düzenleme (Annotasyon)'),
-        'status': 'Geliştiriliyor',
+        'onTap': () => _showComingSoon(context, 'PDF Düzenleme')
       },
       {
         'icon': Icons.volume_up,
         'name': 'Sesli okuma',
         'color': const Color(0xFFF3E5F5),
-        'onTap': () => _ttsService.speakPdf(), 
-        'status': _ttsService.isPlaying ? 'Durdur' : 'Çalışıyor',
+        'onTap': () => _showComingSoon(context, 'Sesli Okuma')
       },
       {
         'icon': Icons.edit_document,
         'name': 'PDF Doldur & İmzala',
         'color': const Color(0xFFE8F5E8),
-        'onTap': () => _showSignaturePad(), 
-        'status': 'Geliştiriliyor',
+        'onTap': () => _showComingSoon(context, 'PDF Doldur & İmzala')
       },
       {
         'icon': Icons.picture_as_pdf,
-        'name': 'Görselden PDF Oluştur',
+        'name': 'PDF Oluştur',
         'color': const Color(0xFFE3F2FD),
-        'onTap': () => _pdfService.createPdfFromImages(), 
-        'status': 'Çalışıyor',
+        'onTap': onPickFile // Ana sayfadan gelen fonksiyonu tetikler
       },
       {
         'icon': Icons.layers,
         'name': 'Sayfaları organize et',
         'color': const Color(0xFFFFF3E0),
-        'onTap': () => _showComingSoon('Sayfa Organizasyonu'),
-        'status': 'Geliştiriliyor',
+        'onTap': () => _showComingSoon(context, 'Sayfa Organizasyonu')
       },
       {
         'icon': Icons.merge,
         'name': 'Dosyaları birleştirme',
         'color': const Color(0xFFE0F2F1),
-        'onTap': () => _pdfService.mergePdfs(), 
-        'status': 'Çalışıyor',
+        'onTap': () => _showComingSoon(context, 'Dosya Birleştirme')
       },
     ];
 
-    return Stack(
-      children: [
-        GridView.builder(
-          padding: const EdgeInsets.all(16),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.8,
-          ),
-          itemCount: tools.length,
-          itemBuilder: (context, index) {
-            final tool = tools[index];
-            bool isWorking = tool['status'] == 'Çalışıyor' || tool['status'] == 'Durdur';
-            
-            return Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: InkWell(
-                borderRadius: BorderRadius.circular(16),
-                onTap: tool['onTap'] as Function(),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 64,
-                        height: 64,
-                        decoration: BoxDecoration(
-                          color: tool['color'] as Color,
-                          borderRadius: BorderRadius.circular(16),
-                          boxShadow: [
-                            BoxShadow(
-                              color: (tool['color'] as Color).withOpacity(0.5),
-                              spreadRadius: 1,
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          tool['icon'] as IconData, 
-                          color: isWorking ? const Color(0xFFD32F2F) : Colors.grey,
-                          size: 36
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        tool['name'] as String,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 16, 
-                          fontWeight: FontWeight.w700, 
-                          color: isWorking ? const Color(0xFFD32F2F) : Colors.grey.shade700,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        tool['status'] as String,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: isWorking ? Colors.green.shade600 : Colors.red.shade400,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+    return GridView.builder(
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 0.8,
+      ),
+      itemCount: tools.length,
+      itemBuilder: (context, index) {
+        final tool = tools[index];
+        return Card(
+          elevation: 2,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: tool['onTap'] as Function(),
+            child: Container(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      color: tool['color'] as Color,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(tool['icon'] as IconData, color: const Color(0xFFD32F2F), size: 30),
                   ),
-                ),
+                  const SizedBox(height: 12),
+                  Text(
+                    tool['name'] as String,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 14, 
+                      fontWeight: FontWeight.w600, 
+                      color: Color(0xFFD32F2F),
+                    ),
+                    maxLines: 2,
+                  ),
+                ],
               ),
-            );
-          },
-        ),
-
-        // Sesli Okuma Kontrol Paneli
-        if (_ttsService.showControlPanel)
-          Positioned(
-            left: 0,
-            right: 0,
-            bottom: 0,
-            child: TtsControlPanel(
-              ttsService: _ttsService,
-              onClose: () {
-                _ttsService.hideControlPanel();
-              },
             ),
           ),
-      ],
+        );
+      },
     );
   }
 }
