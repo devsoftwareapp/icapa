@@ -37,7 +37,7 @@ class AppLanguages {
     Language(code: 'sw_TZ', name: 'Swahili', nativeName: 'Kiswahili', flag: '🇹🇿'),
     Language(code: 'bn_BD', name: 'Bengali', nativeName: 'বাংলা', flag: '🇧🇩'),
     Language(code: 'fi_FI', name: 'Kurmanci', nativeName: 'Kurdî - Zarava Kurmancî', flag: '🇫🇮'),
-    Language(code: 'zw_ZW', name: 'Zazakî', nativeName: 'Kurdî - Zarava Zazakî', flag: '🇿🇼'),
+    Language(code: 'cs_CS', name: 'Zazakî', nativeName: 'Kurdî - Zarava Zazakî', flag: '🇿🇼'),
   ];
 
   // SharedPreferences anahtarı
