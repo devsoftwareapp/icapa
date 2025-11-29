@@ -1,7 +1,6 @@
 {
   "@@locale": "sw_TZ",
   
-  // App & General
   "appTitle": "Kisomaji PDF",
   "appSubtitle": "Mtazamaji na Mhariri",
   "devSoftware": "Dev Software",
@@ -20,23 +19,19 @@
   "warning": "Onyo",
   "info": "Taarifa",
   
-  // Main Tabs
   "home": "Nyumbani",
   "tools": "Zana", 
   "files": "Faili",
   
-  // Home Sub Tabs
   "onDevice": "Kwenye Kifaa",
   "recent": "Hivi Karibuni",
   "favorites": "Vipendwa",
   
-  // Drawer Menu
   "about": "Kuhusu",
   "helpAndSupport": "Msaada na Usaidizi",
   "languages": "Lugha",
   "privacy": "Faragha",
   
-  // File Operations
   "fileSelection": "Uchaguzi wa Faili",
   "pickFile": "Chagua Faili",
   "scanAgain": "Scan Tenna",
@@ -47,14 +42,12 @@
   "filePrinted": "Faili Imechapishwa",
   "fileSaved": "Faili Imehifadhiwa",
   
-  // Search & Filter
   "searchPdfs": "Tafuta kwenye PDF...",
   "searchHistory": "Historia ya Utafutaji",
   "clearHistory": "Futa Historia",
   "noResults": "Hakuna Matokeo Yaliyopatikana",
   "searchResults": "Matokeo ya Utafutaji",
   
-  // Permissions
   "permissionRequired": "Kibali Kinahitajika",
   "fileAccessPermission": "Kibali cha Ufikiaji wa Faili",
   "grantPermission": "Kubali",
@@ -62,18 +55,15 @@
   "permissionDenied": "Kibali Kimekataliwa",
   "permissionGranted": "Kibali Kimekubaliwa",
   
-  // FAB Menu
   "selectFile": "Chagua Faili",
   "scan": "Scan",
   "fromImage": "Kutoka Picha",
   
-  // Cloud Services
   "cloudStorage": "Hifadhi ya Wingu",
   "emailIntegration": "Ujumuishaji wa Barua Pepe",
   "pdfsFromEmails": "PDF kutoka Barua Pepe",
   "browseForMoreFiles": "Vinjari kwa Faili Zaidi",
   
-  // Tools Screen
   "pdfMerger": "Muunganisho PDF",
   "pdfSigner": "Saini PDF", 
   "pdfCompressor": "Kompresi PDF",
@@ -85,7 +75,6 @@
   "organizePages": "Panga Kurasa",
   "addImageToPdf": "Ongeza Picha kwenye PDF",
   
-  // Tool Loading States
   "toolLoading": "Zana Inapakia...",
   "mergerLoading": "Muunganishaji PDF Inapakia...",
   "signerLoading": "Sainisha PDF Inapakia...",
@@ -98,7 +87,6 @@
   "pageOrganizerLoading": "Mpangaji Kurasa Inapakia...",
   "imageInserterLoading": "Kichomaji Picha Inapakia...",
   
-  // Viewer Screen
   "pdfViewer": "Mtazamaji PDF",
   "pdfLoading": "PDF Inapakia...",
   "page": "Ukurasa",
@@ -109,14 +97,12 @@
   "fitToPage": "Lingana na Ukurasa",
   "actualSize": "Ukubwa Halisi",
   
-  // About Dialog
   "aboutPdfReader": "Kuhusu Kisomaji PDF",
   "advancedPdfViewing": "Programu ya hali ya juu ya kutazama na kusimamia PDF.",
   "technologiesUsed": "Teknolojia Zilizotumika",
   "licenseInfo": "Taarifa ya Leseni",
   "openSourceTechnologies": "Programu hii imetengenezwa kwa kutumia teknolojia za chanzo wazi.",
   
-  // Help & Support
   "helpSupport": "Msaada na Usaidizi",
   "describeIssue": "Elezea tatizo lako au pendekezo:",
   "yourEmail": "Anwani Yako ya Barua Pepe",
@@ -125,7 +111,6 @@
   "fillAllFields": "Tafadhali jaza sehemu zote",
   "messageRedirecting": "Ujumbe wako unaelekezwa kwenye programu ya barua pepe...",
   
-  // Language Settings
   "languageSettings": "Mipangilio ya Lugha",
   "appLanguage": "Lugha ya Programu",
   "pdfViewerLanguage": "Lugha ya Mtazamaji PDF",
@@ -137,12 +122,10 @@
   "restartLater": "Baadaye",
   "restartNow": "Anzisha Upya Sasa",
   
-  // Privacy
   "privacyPolicy": "Sera ya Faragha",
   "comingSoon": "Inakuja Hivi Karibuni",
   "featureComingSoon": "Hiki kipengele kinakuja hivi karibuni! 🚀",
   
-  // Notifications & Alerts
   "pdfSavedSuccess": "PDF imehifadhiwa kwa mafanikio",
   "pdfSaveError": "Hitilafu ya kuhifadhi PDF",
   "pdfOpenError": "Hitilafu ya kufungua PDF",
@@ -152,35 +135,57 @@
   "deleteError": "Hitilafu ya kufuta",
   "permissionError": "Hitilafu ya kibali",
   
-  // Empty States
   "noPdfFiles": "Hakuna faili za PDF zilizopatikana",
   "noRecentFiles": "Bado hakuna faili za hivi karibuni",
   "noFavorites": "Bado hakuna vipendwa",
   "noSearchResults": "Hakuna matokeo ya utafutaji yaliyopatikana",
   
-  // File Info
   "fileSize": "Ukubwa wa Faili",
   "modifiedDate": "Tarehe ya Kubadilishwa",
   "fileInfo": "Taarifa za Faili",
   
-  // Confirmation Dialogs
   "confirmDelete": "Thibitisha Kufuta",
   "deleteConfirmation": "Je, una uhakika unataka kufuta \"{fileName}\"? Kitendo hiki hakiwezi kutenduliwa.",
   "confirmRename": "Thibitisha Kubadilisha Jina",
   "newFileName": "Jina jipya la faili",
   
-  // Cloud Service Names
   "googleDrive": "Google Drive",
   "oneDrive": "OneDrive", 
   "dropbox": "Dropbox",
   "gmail": "Gmail",
   
-  // Feature Tags
   "premium": "Premium",
   "new": "Mpya",
   "popular": "Maarufu",
   
   "@appTitle": {
     "description": "Kichwa kikuu cha programu"
+  },
+  "@home": {
+    "description": "Kichwa cha kichupo cha nyumbani"
+  },
+  "@tools": {
+    "description": "Kichwa cha kichupo cha zana"
+  },
+  "@files": {
+    "description": "Kichwa cha kichupo cha faili"
+  },
+  "@searchPdfs": {
+    "description": "Maandishi ya kihifadhi eneo la utafutaji"
+  },
+  "@pdfViewer": {
+    "description": "Kichwa cha skrini ya mtazamaji PDF"
+  },
+  "@about": {
+    "description": "Sehemu ya kuhusu kwenye droo"
+  },
+  "@helpAndSupport": {
+    "description": "Sehemu ya msaada na usaidizi"
+  },
+  "@languages": {
+    "description": "Mipangilio ya lugha"
+  },
+  "@privacy": {
+    "description": "Sera ya faragha"
   }
 }
