@@ -36,6 +36,14 @@ dev_dependencies:
   flutter_gen_runner: ^5.4.0
   build_runner: ^2.4.7
 
+
+flutter_icons:
+  image_path: "icon/icon.png"
+  android: true
+  adaptive_icon_background: "#ffffff"
+  adaptive_icon_foreground: "icon/icon.png"
+
+
 # --- BURASI ÖNEMLİ: flutter_gen BURAYA ALINDI ---
 flutter_gen:
   output: lib/gen/
