@@ -1,0 +1,213 @@
+{
+  "@@locale": "ur_PK",
+  
+  // App & General
+  "appTitle": "PDF ریڈر",
+  "appSubtitle": "ویور اور ایڈیٹر",
+  "devSoftware": "Dev Software",
+  "version": "ورژن",
+  "close": "بند کریں",
+  "cancel": "منسوخ کریں",
+  "save": "محفوظ کریں",
+  "delete": "حذف کریں",
+  "share": "شیئر کریں",
+  "print": "پرنٹ کریں",
+  "rename": "نام تبدیل کریں",
+  "search": "تلاش کریں",
+  "loading": "لوڈ ہو رہا ہے...",
+  "error": "خرابی",
+  "success": "کامیابی",
+  "warning": "انتباہ",
+  "info": "معلومات",
+  
+  // Main Tabs
+  "home": "ہوم",
+  "tools": "ٹولز", 
+  "files": "فائلیں",
+  
+  // Home Sub Tabs
+  "onDevice": "ڈیوائس پر",
+  "recent": "حالیہ",
+  "favorites": "پسندیدہ",
+  
+  // Drawer Menu
+  "about": "متعلق",
+  "helpAndSupport": "مدد اور سپورٹ",
+  "languages": "زبانیں",
+  "privacy": "پرائیویسی",
+  
+  // File Operations
+  "fileSelection": "فائل انتخاب",
+  "pickFile": "فائل منتخب کریں",
+  "scanAgain": "دوبارہ سکین کریں",
+  "fileNotFound": "فائل نہیں ملی",
+  "fileDeleted": "فائل حذف ہو گئی",
+  "fileRenamed": "فائل کا نام تبدیل ہو گیا",
+  "fileShared": "فائل شیئر ہو گئی",
+  "filePrinted": "فائل پرنٹ ہو گئی",
+  "fileSaved": "فائل محفوظ ہو گئی",
+  
+  // Search & Filter
+  "searchPdfs": "PDF میں تلاش کریں...",
+  "searchHistory": "تلاش کی تاریخ",
+  "clearHistory": "تاریخ صاف کریں",
+  "noResults": "کوئی نتائج نہیں ملے",
+  "searchResults": "تلاش کے نتائج",
+  
+  // Permissions
+  "permissionRequired": "اجازت درکار",
+  "fileAccessPermission": "فائل رسائی کی اجازت",
+  "grantPermission": "اجازت دیں",
+  "goToSettings": "ترتیبات پر جائیں",
+  "permissionDenied": "اجازت مسترد",
+  "permissionGranted": "اجازت دی گئی",
+  
+  // FAB Menu
+  "selectFile": "فائل منتخب کریں",
+  "scan": "سکین کریں",
+  "fromImage": "تصویر سے",
+  
+  // Cloud Services
+  "cloudStorage": "کلاؤڈ اسٹوریج",
+  "emailIntegration": "ای میل انٹیگریشن",
+  "pdfsFromEmails": "ای میلز سے PDF",
+  "browseForMoreFiles": "مزید فائلیں براؤز کریں",
+  
+  // Tools Screen
+  "pdfMerger": "PDF ملاپ",
+  "pdfSigner": "PDF دستخط", 
+  "pdfCompressor": "PDF کمپریسر",
+  "imageToPdf": "تصویر سے PDF",
+  "textToSpeech": "ٹیکسٹ ٹو اسپیچ",
+  "ocrTextExtraction": "OCR متن نکالنے",
+  "pdfToImage": "PDF سے تصویر",
+  "addTextToPdf": "PDF میں متن شامل کریں",
+  "organizePages": "صفحات کو منظم کریں",
+  "addImageToPdf": "PDF میں تصویر شامل کریں",
+  
+  // Tool Loading States
+  "toolLoading": "ٹول لوڈ ہو رہا ہے...",
+  "mergerLoading": "PDF ملاپ لوڈ ہو رہا ہے...",
+  "signerLoading": "PDF دستخط لوڈ ہو رہا ہے...",
+  "compressorLoading": "PDF کمپریسر لوڈ ہو رہا ہے...",
+  "imageConverterLoading": "تصویر کنورٹر لوڈ ہو رہا ہے...",
+  "ttsLoading": "ٹیکسٹ ٹو اسپیچ لوڈ ہو رہا ہے...",
+  "ocrLoading": "OCR لوڈ ہو رہا ہے...",
+  "pdfToImageLoading": "PDF سے تصویر کنورٹر لوڈ ہو رہا ہے...",
+  "textEditorLoading": "ٹیکسٹ ایڈیٹر لوڈ ہو رہا ہے...",
+  "pageOrganizerLoading": "صفحہ آرگنائزر لوڈ ہو رہا ہے...",
+  "imageInserterLoading": "تصویر داخل کرنے والا لوڈ ہو رہا ہے...",
+  
+  // Viewer Screen
+  "pdfViewer": "PDF ویور",
+  "pdfLoading": "PDF لوڈ ہو رہا ہے...",
+  "page": "صفحہ",
+  "of": "/",
+  "zoomIn": "زوم ان",
+  "zoomOut": "زوم آؤٹ",
+  "fitToWidth": "چوڑائی میں فٹ کریں",
+  "fitToPage": "صفحہ میں فٹ کریں",
+  "actualSize": "اصل سائز",
+  
+  // About Dialog
+  "aboutPdfReader": "PDF ریڈر کے بارے میں",
+  "advancedPdfViewing": "ایڈوانس PDF دیکھنے اور مینجمنٹ ایپلیکیشن۔",
+  "technologiesUsed": "استعمال ہونے والی ٹیکنالوجیز",
+  "licenseInfo": "لائسنس کی معلومات",
+  "openSourceTechnologies": "یہ ایپلیکیشن اوپن سورس ٹیکنالوجیز کا استعمال کرتے ہوئے تیار کی گئی ہے۔",
+  
+  // Help & Support
+  "helpSupport": "مدد اور سپورٹ",
+  "describeIssue": "اپنا مسئلہ یا تجویز بیان کریں:",
+  "yourEmail": "آپ کا ای میل پتہ",
+  "yourMessage": "آپ کا پیغام",
+  "send": "بھیجیں",
+  "fillAllFields": "براہ کرم تمام فیلڈز بھریں",
+  "messageRedirecting": "آپ کا پیغام ای میل ایپ پر ری ڈائریکٹ ہو رہا ہے...",
+  
+  // Language Settings
+  "languageSettings": "زبان کی ترتیبات",
+  "appLanguage": "ایپ کی زبان",
+  "pdfViewerLanguage": "PDF ویور کی زبان",
+  "systemLanguage": "سسٹم زبان (تجویز کردہ)",
+  "deviceLanguage": "ڈیوائس زبان",
+  "changeLanguage": "زبان تبدیل کریں",
+  "languageChanged": "زبان تبدیل ہو گئی",
+  "restartRequired": "تبدیلیوں کے اثر پذیر ہونے کے لیے ایپ کو دوبارہ شروع کرنا ضروری ہے",
+  "restartLater": "بعد میں",
+  "restartNow": "ابھی دوبارہ شروع کریں",
+  
+  // Privacy
+  "privacyPolicy": "پرائیویسی پالیسی",
+  "comingSoon": "جلد آ رہا ہے",
+  "featureComingSoon": "یہ فیچر جلد آ رہا ہے! 🚀",
+  
+  // Notifications & Alerts
+  "pdfSavedSuccess": "PDF کامیابی سے محفوظ ہو گیا",
+  "pdfSaveError": "PDF محفوظ کرنے میں خرابی",
+  "pdfOpenError": "PDF کھولنے میں خرابی",
+  "fileShareError": "فائل شیئر کرنے میں خرابی",
+  "printError": "پرنٹنگ خرابی",
+  "renameError": "نام تبدیل کرنے میں خرابی",
+  "deleteError": "حذف کرنے میں خرابی",
+  "permissionError": "اجازت کی خرابی",
+  
+  // Empty States
+  "noPdfFiles": "کوئی PDF فائلیں نہیں ملیں",
+  "noRecentFiles": "ابھی تک کوئی حالیہ فائلیں نہیں ہیں",
+  "noFavorites": "ابھی تک کوئی پسندیدہ نہیں ہیں",
+  "noSearchResults": "کوئی تلاش کے نتائج نہیں ملے",
+  
+  // File Info
+  "fileSize": "فائل کا سائز",
+  "modifiedDate": "ترمیم کی تاریخ",
+  "fileInfo": "فائل کی معلومات",
+  
+  // Confirmation Dialogs
+  "confirmDelete": "حذف کی تصدیق کریں",
+  "deleteConfirmation": "کیا آپ واقعی \"{fileName}\" حذف کرنا چاہتے ہیں؟ یہ عمل واپس نہیں ہو سکتا۔",
+  "confirmRename": "نام تبدیل کرنے کی تصدیق کریں",
+  "newFileName": "نیا فائل نام",
+  
+  // Cloud Service Names
+  "googleDrive": "Google Drive",
+  "oneDrive": "OneDrive", 
+  "dropbox": "Dropbox",
+  "gmail": "Gmail",
+  
+  // Feature Tags
+  "premium": "پریمیم",
+  "new": "نیا",
+  "popular": "مقبول",
+  
+  "@appTitle": {
+    "description": "ایپ کا مرکزی عنوان"
+  },
+  "@home": {
+    "description": "ہوم ٹیب کا عنوان"
+  },
+  "@tools": {
+    "description": "ٹولز ٹیب کا عنوان"
+  },
+  "@files": {
+    "description": "فائلیں ٹیب کا عنوان"
+  },
+  "@searchPdfs": {
+    "description": "سرچ فیلڈ پلیس ہولڈر ٹیکسٹ"
+  },
+  "@pdfViewer": {
+    "description": "PDF ویور اسکرین کا عنوان"
+  },
+  "@about": {
+    "description": "ڈراور میں متعلقہ سیکشن"
+  },
+  "@helpAndSupport": {
+    "description": "مدد اور سپورٹ سیکشن"
+  },
+  "@languages": {
+    "description": "زبان کی ترتیبات"
+  },
+  "@privacy": {
+    "description": "پرائیویسی پالیسی"
+  }
+}
