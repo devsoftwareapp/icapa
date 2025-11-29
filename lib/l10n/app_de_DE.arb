@@ -1,7 +1,6 @@
 {
   "@@locale": "de_DE",
   
-  // App & General
   "appTitle": "PDF Reader",
   "appSubtitle": "Betrachter & Editor",
   "devSoftware": "Dev Software",
@@ -20,23 +19,19 @@
   "warning": "Warnung",
   "info": "Information",
   
-  // Main Tabs
   "home": "Startseite",
   "tools": "Werkzeuge", 
   "files": "Dateien",
   
-  // Home Sub Tabs
   "onDevice": "Auf Gerät",
   "recent": "Zuletzt",
   "favorites": "Favoriten",
   
-  // Drawer Menu
   "about": "Über",
   "helpAndSupport": "Hilfe & Support",
   "languages": "Sprachen",
   "privacy": "Datenschutz",
   
-  // File Operations
   "fileSelection": "Dateiauswahl",
   "pickFile": "Datei auswählen",
   "scanAgain": "Erneut scannen",
@@ -47,14 +42,12 @@
   "filePrinted": "Datei gedruckt",
   "fileSaved": "Datei gespeichert",
   
-  // Search & Filter
   "searchPdfs": "In PDFs suchen...",
   "searchHistory": "Suchverlauf",
   "clearHistory": "Verlauf löschen",
   "noResults": "Keine Ergebnisse gefunden",
   "searchResults": "Suchergebnisse",
   
-  // Permissions
   "permissionRequired": "Berechtigung erforderlich",
   "fileAccessPermission": "Dateizugriffsberechtigung",
   "grantPermission": "Berechtigung erteilen",
@@ -62,18 +55,15 @@
   "permissionDenied": "Berechtigung verweigert",
   "permissionGranted": "Berechtigung erteilt",
   
-  // FAB Menu
   "selectFile": "Datei auswählen",
   "scan": "Scannen",
   "fromImage": "Aus Bild",
   
-  // Cloud Services
   "cloudStorage": "Cloud-Speicher",
   "emailIntegration": "E-Mail-Integration",
   "pdfsFromEmails": "PDFs aus E-Mails",
   "browseForMoreFiles": "Weitere Dateien durchsuchen",
   
-  // Tools Screen
   "pdfMerger": "PDF zusammenführen",
   "pdfSigner": "PDF signieren", 
   "pdfCompressor": "PDF komprimieren",
@@ -85,7 +75,6 @@
   "organizePages": "Seiten organisieren",
   "addImageToPdf": "Bild zu PDF hinzufügen",
   
-  // Tool Loading States
   "toolLoading": "Werkzeug wird geladen...",
   "mergerLoading": "PDF-Zusammenführer wird geladen...",
   "signerLoading": "PDF-Signierer wird geladen...",
@@ -98,7 +87,6 @@
   "pageOrganizerLoading": "Seitenorganisator wird geladen...",
   "imageInserterLoading": "Bildeinfüger wird geladen...",
   
-  // Viewer Screen
   "pdfViewer": "PDF-Betrachter",
   "pdfLoading": "PDF wird geladen...",
   "page": "Seite",
@@ -109,14 +97,12 @@
   "fitToPage": "An Seite anpassen",
   "actualSize": "Tatsächliche Größe",
   
-  // About Dialog
   "aboutPdfReader": "Über PDF Reader",
   "advancedPdfViewing": "Erweiterte PDF-Betrachtungs- und Verwaltungsanwendung.",
   "technologiesUsed": "Verwendete Technologien",
   "licenseInfo": "Lizenzinformationen",
   "openSourceTechnologies": "Diese Anwendung wird mit Open-Source-Technologien entwickelt.",
   
-  // Help & Support
   "helpSupport": "Hilfe & Support",
   "describeIssue": "Beschreiben Sie Ihr Problem oder Ihren Vorschlag:",
   "yourEmail": "Ihre E-Mail-Adresse",
@@ -125,7 +111,6 @@
   "fillAllFields": "Bitte füllen Sie alle Felder aus",
   "messageRedirecting": "Ihre Nachricht wird an die E-Mail-App weitergeleitet...",
   
-  // Language Settings
   "languageSettings": "Spracheinstellungen",
   "appLanguage": "App-Sprache",
   "pdfViewerLanguage": "PDF-Betrachter-Sprache",
@@ -137,12 +122,10 @@
   "restartLater": "Später",
   "restartNow": "Jetzt neu starten",
   
-  // Privacy
   "privacyPolicy": "Datenschutzerklärung",
   "comingSoon": "Demnächst",
   "featureComingSoon": "Diese Funktion kommt demnächst! 🚀",
   
-  // Notifications & Alerts
   "pdfSavedSuccess": "PDF erfolgreich gespeichert",
   "pdfSaveError": "Fehler beim Speichern des PDF",
   "pdfOpenError": "Fehler beim Öffnen des PDF",
@@ -152,30 +135,25 @@
   "deleteError": "Fehler beim Löschen",
   "permissionError": "Berechtigungsfehler",
   
-  // Empty States
   "noPdfFiles": "Keine PDF-Dateien gefunden",
   "noRecentFiles": "Noch keine kürzlichen Dateien",
   "noFavorites": "Noch keine Favoriten",
   "noSearchResults": "Keine Suchergebnisse gefunden",
   
-  // File Info
   "fileSize": "Dateigröße",
   "modifiedDate": "Änderungsdatum",
   "fileInfo": "Dateiinformationen",
   
-  // Confirmation Dialogs
   "confirmDelete": "Löschen bestätigen",
   "deleteConfirmation": "Sind Sie sicher, dass Sie \"{fileName}\" löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
   "confirmRename": "Umbenennen bestätigen",
   "newFileName": "Neuer Dateiname",
   
-  // Cloud Service Names
   "googleDrive": "Google Drive",
   "oneDrive": "OneDrive", 
   "dropbox": "Dropbox",
   "gmail": "Gmail",
   
-  // Feature Tags
   "premium": "Premium",
   "new": "Neu",
   "popular": "Beliebt",
