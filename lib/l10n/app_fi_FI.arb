@@ -1,0 +1,213 @@
+{
+  "@@locale": "fi_FI",
+  
+  // App & General
+  "appTitle": "PDF Xerîvar",
+  "appSubtitle": "Dîtin & Sererastkirin",
+  "devSoftware": "Nivîsbarîya Pêşvebir",
+  "version": "Awayî",
+  "close": "Bigre",
+  "cancel": "Betal bike",
+  "save": "Tomar bike",
+  "delete": "Jê bibe",
+  "share": "Parve bike",
+  "print": "Çap bike",
+  "rename": "Navê nû bike",
+  "search": "Lêgerîn",
+  "loading": "Tê barkirin...",
+  "error": "Çewtî",
+  "success": "Serkeftin",
+  "warning": "Hişyarî",
+  "info": "Agahdarî",
+  
+  // Main Tabs
+  "home": "Mal",
+  "tools": "Amûr", 
+  "files": "Dosye",
+  
+  // Home Sub Tabs
+  "onDevice": "Li ser Amûrê",
+  "recent": "Nêzda",
+  "favorites": "Hezkirî",
+  
+  // Drawer Menu
+  "about": "Derbarê",
+  "helpAndSupport": "Alîkarî & Piştgirî",
+  "languages": "Ziman",
+  "privacy": "Taybetî",
+  
+  // File Operations
+  "fileSelection": "Dosya Hilbijartin",
+  "pickFile": "Dosye Hilbijêre",
+  "scanAgain": "Dîsa Scan bike",
+  "fileNotFound": "Dosye Nehat Dîtin",
+  "fileDeleted": "Dosye Hatin Jêbirin",
+  "fileRenamed": "Dosye Hatin Navkirin",
+  "fileShared": "Dosye Hatin Parvekirin",
+  "filePrinted": "Dosye Hatin Çapkirin",
+  "fileSaved": "Dosye Hatin Tomarkirin",
+  
+  // Search & Filter
+  "searchPdfs": "PDF'an bigerin...",
+  "searchHistory": "Dîroka Lêgerînê",
+  "clearHistory": "Dîrokê Paqij bike",
+  "noResults": "Encam nehat dîtin",
+  "searchResults": "Encamên Lêgerînê",
+  
+  // Permissions
+  "permissionRequired": "Destûr Pêwîst",
+  "fileAccessPermission": "Destûra Gihîştina Dosyeyan",
+  "grantPermission": "Destûr Bide",
+  "goToSettings": "Biçe Sazkanan",
+  "permissionDenied": "Destûr Redkirin",
+  "permissionGranted": "Destûr Hat Dayin",
+  
+  // FAB Menu
+  "selectFile": "Dosye Hilbijêre",
+  "scan": "Scan",
+  "fromImage": "Ji Wêne",
+  
+  // Cloud Services
+  "cloudStorage": "Embara Ewrê",
+  "emailIntegration": "Pêkhateya E-nameyê",
+  "pdfsFromEmails": "PDF'an ji E-nameyan",
+  "browseForMoreFiles": "Ji bo Dosyeyên Zêdetir Bigere",
+  
+  // Tools Screen
+  "pdfMerger": "PDF Tevlihevr",
+  "pdfSigner": "PDF Îmzeker", 
+  "pdfCompressor": "PDF Pêkveçapker",
+  "imageToPdf": "Wêne bo PDF",
+  "textToSpeech": "Nivîs bo Axiftin",
+  "ocrTextExtraction": "Derxistina Nivîsê OCR",
+  "pdfToImage": "PDF bo Wêne",
+  "addTextToPdf": "Nivîsê lê zêde bike PDF",
+  "organizePages": "Rûpelan Rêk bike",
+  "addImageToPdf": "Wêneyê lê zêde bike PDF",
+  
+  // Tool Loading States
+  "toolLoading": "Amûr tê barkirin...",
+  "mergerLoading": "PDF Tevlihevr tê barkirin...",
+  "signerLoading": "PDF Îmzeker tê barkirin...",
+  "compressorLoading": "PDF Pêkveçapker tê barkirin...",
+  "imageConverterLoading": "Veguherînera Wêneyê tê barkirin...",
+  "ttsLoading": "Nivîs bo Axiftin tê barkirin...",
+  "ocrLoading": "OCR tê barkirin...",
+  "pdfToImageLoading": "Veguherînera PDF bo Wêne tê barkirin...",
+  "textEditorLoading": "Editora Nivîsê tê barkirin...",
+  "pageOrganizerLoading": "Rêkera Rûpelan tê barkirin...",
+  "imageInserterLoading": "Têxera Wêneyê tê barkirin...",
+  
+  // Viewer Screen
+  "pdfViewer": "Dîtvana PDF",
+  "pdfLoading": "PDF tê barkirin...",
+  "page": "Rûpel",
+  "of": "ji",
+  "zoomIn": "Zêdekirina Zoom",
+  "zoomOut": "Kêmkirina Zoom",
+  "fitToWidth": "Li Firehiyê bicîh bike",
+  "fitToPage": "Li Rûpelê bicîh bike",
+  "actualSize": "Mezinahiya Rast",
+  
+  // About Dialog
+  "aboutPdfReader": "Derbarê PDF Xerîvar",
+  "advancedPdfViewing": "Serîlêdana pêşkeftî ya dîtin û birêvebirina PDF'an.",
+  "technologiesUsed": "Teknolojiyên Bikaranînî",
+  "licenseInfo": "Agahdariya Lîsansê",
+  "openSourceTechnologies": "Ev serîlêdan bi karanîna teknolojiyên vekirî hatî pêşvebirin.",
+  
+  // Help & Support
+  "helpSupport": "Alîkarî & Piştgirî",
+  "describeIssue": "Pirsgirêka xwe an pêşniyara xwe şirove bike:",
+  "yourEmail": "Navnîşana E-nameya Te",
+  "yourMessage": "Peyama Te",
+  "send": "Bişîne",
+  "fillAllFields": "Ji kerema xwe hemî qadan dagirin",
+  "messageRedirecting": "Peyama we tê ber bi serîlêdana e-nameyê ve...",
+  
+  // Language Settings
+  "languageSettings": "Saziyên Ziman",
+  "appLanguage": "Zimanê Serîlêdanê",
+  "pdfViewerLanguage": "Zimanê Dîtvana PDF",
+  "systemLanguage": "Zimanê Sîstemê (Pêşniyar)",
+  "deviceLanguage": "Zimanê Amûrê",
+  "changeLanguage": "Ziman Biguherîne",
+  "languageChanged": "Ziman hat guhertin",
+  "restartRequired": "Ji bo guhertinan bi cih bînê dîsa destpêk pêwîst",
+  "restartLater": "Paşê",
+  "restartNow": "Niha Dîsa Destpêk bike",
+  
+  // Privacy
+  "privacyPolicy": "Siyaseta Taybetiyê",
+  "comingSoon": "Tê Nêzda",
+  "featureComingSoon": "Ev taybetmendî di nêzda tê! 🚀",
+  
+  // Notifications & Alerts
+  "pdfSavedSuccess": "PDF bi serkeftî hat tomarkirin",
+  "pdfSaveError": "Çewtiya tomarkirina PDF",
+  "pdfOpenError": "Çewtiya vekirina PDF",
+  "fileShareError": "Çewtiya parvekirina dosyeyê",
+  "printError": "Çewtiya çapkirinê",
+  "renameError": "Çewtiya navkirinê",
+  "deleteError": "Çewtiya jêbirinê",
+  "permissionError": "Çewtiya destûrê",
+  
+  // Empty States
+  "noPdfFiles": "Dosyeya PDF nehat dîtin",
+  "noRecentFiles": "Hîn dosyeyek nêzda tune",
+  "noFavorites": "Hîn tiştek hezkirî tune",
+  "noSearchResults": "Encama lêgerînê nehat dîtin",
+  
+  // File Info
+  "fileSize": "Mezinahiya Dosyeyê",
+  "modifiedDate": "Dîroka Guhertinê",
+  "fileInfo": "Agahdariya Dosyeyê",
+  
+  // Confirmation Dialogs
+  "confirmDelete": "Jêbirina Piştrast bike",
+  "deleteConfirmation": "Ma tu rastî dixwazî \"{fileName}\" jê bibî? Ev kiryar nikare were vegerandin.",
+  "confirmRename": "Navkirina Piştrast bike",
+  "newFileName": "Navê dosyeya nû",
+  
+  // Cloud Service Names
+  "googleDrive": "Google Drive",
+  "oneDrive": "OneDrive", 
+  "dropbox": "Dropbox",
+  "gmail": "Gmail",
+  
+  // Feature Tags
+  "premium": "Premium",
+  "new": "Nû",
+  "popular": "Populer",
+  
+  "@appTitle": {
+    "description": "Navê sereke yê serîlêdanê"
+  },
+  "@home": {
+    "description": "Sernavê tabê malê"
+  },
+  "@tools": {
+    "description": "Sernavê tabê amûran"
+  },
+  "@files": {
+    "description": "Sernavê tabê dosyeyan"
+  },
+  "@searchPdfs": {
+    "description": "Nivîsa cihê lêgerînê"
+  },
+  "@pdfViewer": {
+    "description": "Sernavê dîtvana PDF"
+  },
+  "@about": {
+    "description": "Beşa derbarê di drawerê de"
+  },
+  "@helpAndSupport": {
+    "description": "Beşa alîkarî û piştgiriyê"
+  },
+  "@languages": {
+    "description": "Saziyên zimanan"
+  },
+  "@privacy": {
+    "description": "Siyaseta taybetiyê"
+  }
+}
