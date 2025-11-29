@@ -10,9 +10,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  
+  # Mevcut ve Stabil Paketler
   file_picker: ^8.1.0
   flutter_inappwebview: ^6.1.5
-  path_provider: ^2.1.5  # GÜNCELLENDİ
+  path_provider: ^2.1.5
   path: ^1.8.3
   permission_handler: ^11.0.1
   device_info_plus: ^11.3.0
@@ -25,6 +27,13 @@ dependencies:
   connectivity_plus: ^5.0.0
   cached_network_image: ^3.3.0
   sqflite: ^2.3.0
+
+  # YENİ PDF ARAÇLARI PAKETLERİ (GÜNCEL VERSİYONLAR)
+  pdf: ^3.11.3 # PDF Motoru (Oluşturma, Birleştirme, Düzenleme)
+  image: ^4.5.4 # Görüntü İşleme (Görselden PDF için)
+  flutter_tts: ^4.2.3 # TTS (Sesli Okuma)
+  read_pdf_text: ^0.3.1 # PDF Metin Çıkarma
+  hand_signature: ^3.1.0+2 # İmza UI (Doldur ve İmzala için)
 
 dev_dependencies:
   flutter_test:
@@ -40,6 +49,7 @@ flutter_icons:
 flutter:
   uses-material-design: true
   
+  # Uygulama Varlıkları (Assets)
   assets:
     - assets/build/pdf.mjs
     - assets/build/pdf.worker.mjs
