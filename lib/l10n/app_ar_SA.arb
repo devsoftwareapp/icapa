@@ -1,0 +1,213 @@
+{
+  "@@locale": "ar_SA",
+  
+  // App & General
+  "appTitle": "قارئ PDF",
+  "appSubtitle": "عارض ومحرر",
+  "devSoftware": "Dev Software",
+  "version": "الإصدار",
+  "close": "إغلاق",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "delete": "حذف",
+  "share": "مشاركة",
+  "print": "طباعة",
+  "rename": "إعادة تسمية",
+  "search": "بحث",
+  "loading": "جاري التحميل...",
+  "error": "خطأ",
+  "success": "نجاح",
+  "warning": "تحذير",
+  "info": "معلومات",
+  
+  // Main Tabs
+  "home": "الرئيسية",
+  "tools": "الأدوات", 
+  "files": "الملفات",
+  
+  // Home Sub Tabs
+  "onDevice": "على الجهاز",
+  "recent": "المؤخرات",
+  "favorites": "المفضلة",
+  
+  // Drawer Menu
+  "about": "حول",
+  "helpAndSupport": "المساعدة والدعم",
+  "languages": "اللغات",
+  "privacy": "الخصوصية",
+  
+  // File Operations
+  "fileSelection": "اختيار الملف",
+  "pickFile": "اختر ملف",
+  "scanAgain": "مسح مرة أخرى",
+  "fileNotFound": "الملف غير موجود",
+  "fileDeleted": "تم حذف الملف",
+  "fileRenamed": "تمت إعادة تسمية الملف",
+  "fileShared": "تم مشاركة الملف",
+  "filePrinted": "تم طباعة الملف",
+  "fileSaved": "تم حفظ الملف",
+  
+  // Search & Filter
+  "searchPdfs": "ابحث في ملفات PDF...",
+  "searchHistory": "سجل البحث",
+  "clearHistory": "مسح السجل",
+  "noResults": "لم يتم العثور على نتائج",
+  "searchResults": "نتائج البحث",
+  
+  // Permissions
+  "permissionRequired": "الإذن مطلوب",
+  "fileAccessPermission": "إذن الوصول إلى الملفات",
+  "grantPermission": "منح الإذن",
+  "goToSettings": "انتقل إلى الإعدادات",
+  "permissionDenied": "تم رفض الإذن",
+  "permissionGranted": "تم منح الإذن",
+  
+  // FAB Menu
+  "selectFile": "اختر ملف",
+  "scan": "مسح",
+  "fromImage": "من صورة",
+  
+  // Cloud Services
+  "cloudStorage": "التخزين السحابي",
+  "emailIntegration": "تكامل البريد الإلكتروني",
+  "pdfsFromEmails": "ملفات PDF من البريد الإلكتروني",
+  "browseForMoreFiles": "تصفح للمزيد من الملفات",
+  
+  // Tools Screen
+  "pdfMerger": "دمج PDF",
+  "pdfSigner": "توقيع PDF", 
+  "pdfCompressor": "ضغط PDF",
+  "imageToPdf": "صورة إلى PDF",
+  "textToSpeech": "نص إلى كلام",
+  "ocrTextExtraction": "استخراج نص OCR",
+  "pdfToImage": "PDF إلى صورة",
+  "addTextToPdf": "إضافة نص إلى PDF",
+  "organizePages": "تنظيم الصفحات",
+  "addImageToPdf": "إضافة صورة إلى PDF",
+  
+  // Tool Loading States
+  "toolLoading": "جاري تحميل الأداة...",
+  "mergerLoading": "جاري تحميل أداة الدمج...",
+  "signerLoading": "جاري تحميل أداة التوقيع...",
+  "compressorLoading": "جاري تحميل أداة الضغط...",
+  "imageConverterLoading": "جاري تحميل محول الصور...",
+  "ttsLoading": "جاري تحميل النص إلى كلام...",
+  "ocrLoading": "جاري تحميل OCR...",
+  "pdfToImageLoading": "جاري تحميل محول PDF إلى صورة...",
+  "textEditorLoading": "جاري تحميل محرر النص...",
+  "pageOrganizerLoading": "جاري تحميل منظم الصفحات...",
+  "imageInserterLoading": "جاري تحميل أداة إدراج الصور...",
+  
+  // Viewer Screen
+  "pdfViewer": "عارض PDF",
+  "pdfLoading": "جاري تحميل PDF...",
+  "page": "صفحة",
+  "of": "من",
+  "zoomIn": "تكبير",
+  "zoomOut": "تصغير",
+  "fitToWidth": "ملاءمة العرض",
+  "fitToPage": "ملاءمة الصفحة",
+  "actualSize": "الحجم الفعلي",
+  
+  // About Dialog
+  "aboutPdfReader": "حول قارئ PDF",
+  "advancedPdfViewing": "تطبيق متقدم لعرض وإدارة ملفات PDF.",
+  "technologiesUsed": "التقنيات المستخدمة",
+  "licenseInfo": "معلومات الترخيص",
+  "openSourceTechnologies": "تم تطوير هذا التطبيق باستخدام تقنيات مفتوحة المصدر.",
+  
+  // Help & Support
+  "helpSupport": "المساعدة والدعم",
+  "describeIssue": "صف مشكلتك أو اقتراحك:",
+  "yourEmail": "عنوان بريدك الإلكتروني",
+  "yourMessage": "رسالتك",
+  "send": "إرسال",
+  "fillAllFields": "يرجى ملء جميع الحقول",
+  "messageRedirecting": "يتم إعادة توجيه رسالتك إلى تطبيق البريد الإلكتروني...",
+  
+  // Language Settings
+  "languageSettings": "إعدادات اللغة",
+  "appLanguage": "لغة التطبيق",
+  "pdfViewerLanguage": "لغة عارض PDF",
+  "systemLanguage": "لغة النظام (موصى به)",
+  "deviceLanguage": "لغة الجهاز",
+  "changeLanguage": "تغيير اللغة",
+  "languageChanged": "تم تغيير اللغة",
+  "restartRequired": "مطلوب إعادة التشغيل لتفعيل التغييرات",
+  "restartLater": "لاحقًا",
+  "restartNow": "أعد التشغيل الآن",
+  
+  // Privacy
+  "privacyPolicy": "سياسة الخصوصية",
+  "comingSoon": "قريبًا",
+  "featureComingSoon": "هذه الميزة قادمة قريبًا! 🚀",
+  
+  // Notifications & Alerts
+  "pdfSavedSuccess": "تم حفظ PDF بنجاح",
+  "pdfSaveError": "خطأ في حفظ PDF",
+  "pdfOpenError": "خطأ في فتح PDF",
+  "fileShareError": "خطأ في مشاركة الملف",
+  "printError": "خطأ في الطباعة",
+  "renameError": "خطأ في إعادة التسمية",
+  "deleteError": "خطأ في الحذف",
+  "permissionError": "خطأ في الإذن",
+  
+  // Empty States
+  "noPdfFiles": "لم يتم العثور على ملفات PDF",
+  "noRecentFiles": "لا توجد ملفات حديثة حتى الآن",
+  "noFavorites": "لا توجد مفضلات حتى الآن",
+  "noSearchResults": "لم يتم العثور على نتائج بحث",
+  
+  // File Info
+  "fileSize": "حجم الملف",
+  "modifiedDate": "تاريخ التعديل",
+  "fileInfo": "معلومات الملف",
+  
+  // Confirmation Dialogs
+  "confirmDelete": "تأكيد الحذف",
+  "deleteConfirmation": "هل أنت متأكد من أنك تريد حذف \"{fileName}\"؟ لا يمكن التراجع عن هذا الإجراء.",
+  "confirmRename": "تأكيد إعادة التسمية",
+  "newFileName": "اسم الملف الجديد",
+  
+  // Cloud Service Names
+  "googleDrive": "Google Drive",
+  "oneDrive": "OneDrive", 
+  "dropbox": "Dropbox",
+  "gmail": "Gmail",
+  
+  // Feature Tags
+  "premium": "بريميوم",
+  "new": "جديد",
+  "popular": "شائع",
+  
+  "@appTitle": {
+    "description": "العنوان الرئيسي للتطبيق"
+  },
+  "@home": {
+    "description": "عنوان علامة التبويب الرئيسية"
+  },
+  "@tools": {
+    "description": "عنوان علامة تبويب الأدوات"
+  },
+  "@files": {
+    "description": "عنوان علامة تبويب الملفات"
+  },
+  "@searchPdfs": {
+    "description": "نص العنصر النائب لحقل البحث"
+  },
+  "@pdfViewer": {
+    "description": "عنوان شاشة عارض PDF"
+  },
+  "@about": {
+    "description": "قسم حول في الدرج"
+  },
+  "@helpAndSupport": {
+    "description": "قسم المساعدة والدعم"
+  },
+  "@languages": {
+    "description": "إعدادات اللغة"
+  },
+  "@privacy": {
+    "description": "سياسة الخصوصية"
+  }
+}
