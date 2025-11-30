@@ -40,7 +40,6 @@ jobs:
       # 5️⃣ 📱 UYGULAMA İKONLARINI OLUŞTUR
       - name: Generate app icons
         run: |
-          flutter pub add dev:flutter_launcher_icons
           flutter pub run flutter_launcher_icons:main
 
       # 6️⃣ 🔐 BASE64'ten KEYSTORE ÇÖZ
