@@ -13,6 +13,14 @@ class AppLocalizations {
 
   static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
+  // ✅ BU SATIRLARI EKLEYİN:
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = [
+    delegate,
+    GlobalMaterialLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+  ];
+
   static const List<Locale> supportedLocales = [
     Locale('en'),
     Locale('tr'),
