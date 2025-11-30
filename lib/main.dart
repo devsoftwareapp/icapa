@@ -17,7 +17,7 @@ import 'package:open_file/open_file.dart';
 import 'package:sqflite/sqflite.dart';
 
 // Import generated localization
-import 'gen/l10n.dart';
+// import 'gen/l10n.dart'; // GEÇİCİ OLARAK KAPALI
 import 'tools_screen.dart';
 import 'app_languages.dart';
 
@@ -99,9 +99,9 @@ class PdfManagerApp extends StatelessWidget {
       title: 'PDF Reader',
       debugShowCheckedModeBanner: false,
       
-      // Localization ayarları
-      localizationsDelegates: AppLocalizations.localizationsDelegates,
-      supportedLocales: _getSupportedLocales(),
+      // Localization ayarları - GEÇİCİ OLARAK KAPALI
+      // localizationsDelegates: AppLocalizations.localizationsDelegates,
+      // supportedLocales: _getSupportedLocales(),
       
       theme: ThemeData(
         primarySwatch: Colors.red,
@@ -209,6 +209,93 @@ class PdfManagerApp extends StatelessWidget {
       const Locale('cs', 'CS'),
     ];
   }
+}
+
+// GEÇİCİ AppLocalizations Sınıfı
+class AppLocalizations {
+  final BuildContext context;
+
+  AppLocalizations(this.context);
+
+  static AppLocalizations of(BuildContext context) {
+    return AppLocalizations(context);
+  }
+
+  // Hardcoded strings - sonra localization ile değiştirilecek
+  String get appTitle => "PDF Reader";
+  String get appSubtitle => "Advanced PDF Manager";
+  String get home => "Home";
+  String get tools => "Tools";
+  String get files => "Files";
+  String get searchPdfs => "Search PDFs";
+  String get scan => "Scan";
+  String get fromImage => "From Image";
+  String get selectFile => "Select File";
+  String get permissionRequired => "Permission Required";
+  String get fileAccessPermission => "File access permission is required to scan for PDF files on your device.";
+  String get grantPermission => "Grant Permission";
+  String get goToSettings => "Go to Settings";
+  String get cancel => "Cancel";
+  String get share => "Share";
+  String get rename => "Rename";
+  String get print => "Print";
+  String get delete => "Delete";
+  String get confirmDelete => "Confirm Delete";
+  String get deleteConfirmation => "Are you sure you want to delete \"{fileName}\"?";
+  String get fileDeleted => "File deleted";
+  String get deleteError => "Delete error";
+  String get fileShared => "File shared";
+  String get fileShareError => "File share error";
+  String get filePrinted => "File printed";
+  String get printError => "Print error";
+  String get confirmRename => "Confirm Rename";
+  String get newFileName => "New file name";
+  String get fileRenamed => "File renamed";
+  String get renameError => "Rename error";
+  String get save => "Save";
+  String get searchHistory => "Search History";
+  String get clearHistory => "Clear History";
+  String get recent => "Recent";
+  String get favorites => "Favorites";
+  String get noRecentFiles => "No recent files";
+  String get noFavorites => "No favorites";
+  String get onDevice => "On Device";
+  String get comingSoon => "Coming Soon";
+  String get cloudStorage => "Cloud Storage";
+  String get googleDrive => "Google Drive";
+  String get oneDrive => "OneDrive";
+  String get dropbox => "Dropbox";
+  String get emailIntegration => "Email Integration";
+  String get pdfsFromEmails => "PDFs from Emails";
+  String get gmail => "Gmail";
+  String get browseForMoreFiles => "Browse for more files";
+  String get about => "About";
+  String get helpAndSupport => "Help & Support";
+  String get languages => "Languages";
+  String get privacy => "Privacy";
+  String get aboutPdfReader => "About PDF Reader";
+  String get advancedPdfViewing => "Advanced PDF viewing and management";
+  String get close => "Close";
+  String get helpSupport => "Help & Support";
+  String get describeIssue => "Describe your issue";
+  String get yourEmail => "Your Email";
+  String get yourMessage => "Your Message";
+  String get fillAllFields => "Please fill all fields";
+  String get send => "Send";
+  String get messageRedirecting => "Message redirecting to email app";
+  String get searchLanguage => "Search language";
+  String get noLanguageFound => "No language found";
+  String get fileSelection => "File selection";
+  String get fileNotFound => "File not found";
+  String get pdfOpenError => "PDF open error";
+  String get pdfLoading => "PDF Loading";
+  String get pdfSavedSuccess => "PDF saved successfully";
+  String get pdfSaveError => "PDF save error";
+  String get privacyPolicy => "Privacy Policy";
+  String get noResults => "No results found";
+  String get noPdfFiles => "No PDF files found";
+  String get loading => "Loading";
+  String get scanAgain => "Scan Again";
 }
 
 class HomePage extends StatefulWidget {
@@ -1379,13 +1466,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                             ),
                             trailing: isCurrent ? Icon(Icons.check, color: Colors.green) : null,
                             onTap: () {
-                              final selectedLocale = _getLocaleFromCode(code);
-                              _languageProvider.setLanguage(Language(
-                                code: code,
-                                name: language['name']!,
-                                nativeName: language['native']!,
-                                flag: '',
-                              ));
+                              _languageProvider.changeLanguage(code);
                               _languageSearchController.clear();
                               _languageSearchQuery = '';
                               Navigator.pop(context);
@@ -1405,32 +1486,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
     );
-  }
-
-  Locale _getLocaleFromCode(String code) {
-    if (code == 'en_US') return const Locale('en', 'US');
-    if (code == 'tr_TR') return const Locale('tr', 'TR');
-    if (code == 'es_ES') return const Locale('es', 'ES');
-    if (code == 'fr_FR') return const Locale('fr', 'FR');
-    if (code == 'de_DE') return const Locale('de', 'DE');
-    if (code == 'zh_CN') return const Locale('zh', 'CN');
-    if (code == 'hi_IN') return const Locale('hi', 'IN');
-    if (code == 'ar_AR') return const Locale('ar', 'AR');
-    if (code == 'ru_RU') return const Locale('ru', 'RU');
-    if (code == 'pt_BR') return const Locale('pt', 'BR');
-    if (code == 'id_ID') return const Locale('id', 'ID');
-    if (code == 'ur_PK') return const Locale('ur', 'PK');
-    if (code == 'ja_JP') return const Locale('ja', 'JP');
-    if (code == 'sw_TZ') return const Locale('sw', 'TZ');
-    if (code == 'bn_BD') return const Locale('bn', 'BD');
-    if (code == 'fi_FI') return const Locale('fi', 'FI');
-    if (code == 'cs_CS') return const Locale('cs', 'CS');
-    
-    if (code.contains('_')) {
-      final parts = code.split('_');
-      return Locale(parts[0], parts.length > 1 ? parts[1] : null);
-    }
-    return Locale(code);
   }
 
   void _showHelpSupport() {
