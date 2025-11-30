@@ -27,6 +27,7 @@ dependencies:
   cached_network_image: ^3.3.0
   sqflite: ^2.3.0
   shared_preferences: ^2.2.2
+  provider: ^6.1.1  # ← BU EKLENDİ
   flutter_localizations:
     sdk: flutter
 
