@@ -16,8 +16,8 @@ import 'package:printing/printing.dart';
 import 'package:open_file/open_file.dart';
 import 'package:sqflite/sqflite.dart';
 
-// Import generated localization
-// import 'gen/l10n.dart'; // GEÇİCİ OLARAK KAPALI
+// Import generated localization - ARTIK AÇIK
+import 'gen/l10n.dart';
 import 'tools_screen.dart';
 import 'app_languages.dart';
 
@@ -90,212 +90,123 @@ Future<void> _createAppFolder() async {
 class PdfManagerApp extends StatelessWidget {
   final Map<String, dynamic>? initialIntent;
   final ThemeManager _themeManager = ThemeManager();
+  final LanguageProvider _languageProvider = LanguageProvider();
 
   PdfManagerApp({super.key, this.initialIntent});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'PDF Reader',
-      debugShowCheckedModeBanner: false,
-      
-      // Localization ayarları - GEÇİCİ OLARAK KAPALI
-      // localizationsDelegates: AppLocalizations.localizationsDelegates,
-      // supportedLocales: _getSupportedLocales(),
-      
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        primaryColor: Color(0xFFD32F2F),
-        scaffoldBackgroundColor: Colors.white,
-        appBarTheme: AppBarTheme(
-          backgroundColor: Color(0xFFD32F2F),
-          foregroundColor: Colors.white,
-          elevation: 2,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Color(0xFFD32F2F),
-          foregroundColor: Colors.white,
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.white,
-          selectedItemColor: Color(0xFFD32F2F),
-          unselectedItemColor: Colors.grey,
-          type: BottomNavigationBarType.fixed,
-        ),
-        tabBarTheme: TabBarTheme(
-          labelColor: Color(0xFFD32F2F),
-          unselectedLabelColor: Colors.grey,
-          indicator: UnderlineTabIndicator(
-            borderSide: BorderSide(width: 2.0, color: Color(0xFFD32F2F)),
-          ),
-        ),
-        cardTheme: CardTheme(
-          elevation: 2,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
+    return ChangeNotifierProvider<LanguageProvider>(
+      create: (context) => _languageProvider,
+      child: Consumer<LanguageProvider>(
+        builder: (context, languageProvider, child) {
+          return FutureBuilder<Locale>(
+            future: _getInitialLocale(languageProvider),
+            builder: (context, snapshot) {
+              final locale = snapshot.data ?? const Locale('en');
+              
+              return MaterialApp(
+                title: 'PDF Reader',
+                debugShowCheckedModeBanner: false,
+                
+                // Localization ayarları - ARTIK AÇIK
+                locale: locale,
+                localizationsDelegates: AppLocalizations.localizationsDelegates,
+                supportedLocales: AppLocalizations.supportedLocales,
+                
+                theme: ThemeData(
+                  primarySwatch: Colors.red,
+                  primaryColor: Color(0xFFD32F2F),
+                  scaffoldBackgroundColor: Colors.white,
+                  appBarTheme: AppBarTheme(
+                    backgroundColor: Color(0xFFD32F2F),
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    systemOverlayStyle: SystemUiOverlayStyle.light,
+                    titleTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  floatingActionButtonTheme: FloatingActionButtonThemeData(
+                    backgroundColor: Color(0xFFD32F2F),
+                    foregroundColor: Colors.white,
+                  ),
+                  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                    backgroundColor: Colors.white,
+                    selectedItemColor: Color(0xFFD32F2F),
+                    unselectedItemColor: Colors.grey,
+                    type: BottomNavigationBarType.fixed,
+                  ),
+                  tabBarTheme: TabBarTheme(
+                    labelColor: Color(0xFFD32F2F),
+                    unselectedLabelColor: Colors.grey,
+                    indicator: UnderlineTabIndicator(
+                      borderSide: BorderSide(width: 2.0, color: Color(0xFFD32F2F)),
+                    ),
+                  ),
+                  cardTheme: CardTheme(
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                ),
+                darkTheme: ThemeData(
+                  primarySwatch: Colors.red,
+                  primaryColor: Color(0xFFD32F2F),
+                  scaffoldBackgroundColor: Colors.grey[900],
+                  appBarTheme: AppBarTheme(
+                    backgroundColor: Colors.grey[800],
+                    foregroundColor: Colors.white,
+                    elevation: 2,
+                    systemOverlayStyle: SystemUiOverlayStyle.light,
+                    titleTextStyle: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  floatingActionButtonTheme: FloatingActionButtonThemeData(
+                    backgroundColor: Color(0xFFD32F2F),
+                    foregroundColor: Colors.white,
+                  ),
+                  bottomNavigationBarTheme: BottomNavigationBarThemeData(
+                    backgroundColor: Colors.grey[800],
+                    selectedItemColor: Color(0xFFD32F2F),
+                    unselectedItemColor: Colors.grey[400],
+                    type: BottomNavigationBarType.fixed,
+                  ),
+                  tabBarTheme: TabBarTheme(
+                    labelColor: Color(0xFFD32F2F),
+                    unselectedLabelColor: Colors.grey[400],
+                    indicator: UnderlineTabIndicator(
+                      borderSide: BorderSide(width: 2.0, color: Color(0xFFD32F2F)),
+                    ),
+                  ),
+                  cardTheme: CardTheme(
+                    elevation: 2,
+                    color: Colors.grey[800],
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  textTheme: TextTheme(
+                    bodyLarge: TextStyle(color: Colors.white),
+                    bodyMedium: TextStyle(color: Colors.white),
+                  ),
+                ),
+                themeMode: _themeManager.themeMode,
+                home: HomePage(initialIntent: initialIntent),
+              );
+            },
+          );
+        },
       ),
-      darkTheme: ThemeData(
-        primarySwatch: Colors.red,
-        primaryColor: Color(0xFFD32F2F),
-        scaffoldBackgroundColor: Colors.grey[900],
-        appBarTheme: AppBarTheme(
-          backgroundColor: Colors.grey[800],
-          foregroundColor: Colors.white,
-          elevation: 2,
-          systemOverlayStyle: SystemUiOverlayStyle.light,
-          titleTextStyle: TextStyle(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        floatingActionButtonTheme: FloatingActionButtonThemeData(
-          backgroundColor: Color(0xFFD32F2F),
-          foregroundColor: Colors.white,
-        ),
-        bottomNavigationBarTheme: BottomNavigationBarThemeData(
-          backgroundColor: Colors.grey[800],
-          selectedItemColor: Color(0xFFD32F2F),
-          unselectedItemColor: Colors.grey[400],
-          type: BottomNavigationBarType.fixed,
-        ),
-        tabBarTheme: TabBarTheme(
-          labelColor: Color(0xFFD32F2F),
-          unselectedLabelColor: Colors.grey[400],
-          indicator: UnderlineTabIndicator(
-            borderSide: BorderSide(width: 2.0, color: Color(0xFFD32F2F)),
-          ),
-        ),
-        cardTheme: CardTheme(
-          elevation: 2,
-          color: Colors.grey[800],
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        ),
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: Colors.white),
-          bodyMedium: TextStyle(color: Colors.white),
-        ),
-      ),
-      themeMode: _themeManager.themeMode,
-      home: HomePage(initialIntent: initialIntent),
     );
   }
 
-  // Desteklenen dilleri belirle
-  List<Locale> _getSupportedLocales() {
-    return [
-      const Locale('en', 'US'),
-      const Locale('tr', 'TR'),
-      const Locale('es', 'ES'),
-      const Locale('fr', 'FR'),
-      const Locale('de', 'DE'),
-      const Locale('zh', 'CN'),
-      const Locale('hi', 'IN'),
-      const Locale('ar', 'AR'),
-      const Locale('ru', 'RU'),
-      const Locale('pt', 'BR'),
-      const Locale('id', 'ID'),
-      const Locale('ur', 'PK'),
-      const Locale('ja', 'JP'),
-      const Locale('sw', 'TZ'),
-      const Locale('bn', 'BD'),
-      const Locale('fi', 'FI'),
-      const Locale('cs', 'CS'),
-    ];
+  Future<Locale> _getInitialLocale(LanguageProvider languageProvider) async {
+    await languageProvider.loadLanguage();
+    return languageProvider.currentLocale;
   }
-}
-
-// GEÇİCİ AppLocalizations Sınıfı
-class AppLocalizations {
-  final BuildContext context;
-
-  AppLocalizations(this.context);
-
-  static AppLocalizations of(BuildContext context) {
-    return AppLocalizations(context);
-  }
-
-  // Hardcoded strings - sonra localization ile değiştirilecek
-  String get appTitle => "PDF Reader";
-  String get appSubtitle => "Advanced PDF Manager";
-  String get home => "Home";
-  String get tools => "Tools";
-  String get files => "Files";
-  String get searchPdfs => "Search PDFs";
-  String get scan => "Scan";
-  String get fromImage => "From Image";
-  String get selectFile => "Select File";
-  String get permissionRequired => "Permission Required";
-  String get fileAccessPermission => "File access permission is required to scan for PDF files on your device.";
-  String get grantPermission => "Grant Permission";
-  String get goToSettings => "Go to Settings";
-  String get cancel => "Cancel";
-  String get share => "Share";
-  String get rename => "Rename";
-  String get print => "Print";
-  String get delete => "Delete";
-  String get confirmDelete => "Confirm Delete";
-  String get deleteConfirmation => "Are you sure you want to delete \"{fileName}\"?";
-  String get fileDeleted => "File deleted";
-  String get deleteError => "Delete error";
-  String get fileShared => "File shared";
-  String get fileShareError => "File share error";
-  String get filePrinted => "File printed";
-  String get printError => "Print error";
-  String get confirmRename => "Confirm Rename";
-  String get newFileName => "New file name";
-  String get fileRenamed => "File renamed";
-  String get renameError => "Rename error";
-  String get save => "Save";
-  String get searchHistory => "Search History";
-  String get clearHistory => "Clear History";
-  String get recent => "Recent";
-  String get favorites => "Favorites";
-  String get noRecentFiles => "No recent files";
-  String get noFavorites => "No favorites";
-  String get onDevice => "On Device";
-  String get comingSoon => "Coming Soon";
-  String get cloudStorage => "Cloud Storage";
-  String get googleDrive => "Google Drive";
-  String get oneDrive => "OneDrive";
-  String get dropbox => "Dropbox";
-  String get emailIntegration => "Email Integration";
-  String get pdfsFromEmails => "PDFs from Emails";
-  String get gmail => "Gmail";
-  String get browseForMoreFiles => "Browse for more files";
-  String get about => "About";
-  String get helpAndSupport => "Help & Support";
-  String get languages => "Languages";
-  String get privacy => "Privacy";
-  String get aboutPdfReader => "About PDF Reader";
-  String get advancedPdfViewing => "Advanced PDF viewing and management";
-  String get close => "Close";
-  String get helpSupport => "Help & Support";
-  String get describeIssue => "Describe your issue";
-  String get yourEmail => "Your Email";
-  String get yourMessage => "Your Message";
-  String get fillAllFields => "Please fill all fields";
-  String get send => "Send";
-  String get messageRedirecting => "Message redirecting to email app";
-  String get searchLanguage => "Search language";
-  String get noLanguageFound => "No language found";
-  String get fileSelection => "File selection";
-  String get fileNotFound => "File not found";
-  String get pdfOpenError => "PDF open error";
-  String get pdfLoading => "PDF Loading";
-  String get pdfSavedSuccess => "PDF saved successfully";
-  String get pdfSaveError => "PDF save error";
-  String get privacyPolicy => "Privacy Policy";
-  String get noResults => "No results found";
-  String get noPdfFiles => "No PDF files found";
-  String get loading => "Loading";
-  String get scanAgain => "Scan Again";
 }
 
 class HomePage extends StatefulWidget {
@@ -327,32 +238,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   Database? _database;
   final ThemeManager _themeManager = ThemeManager();
-  final LanguageProvider _languageProvider = LanguageProvider();
-
-  // Dil verileri - VERİLEN DİLLER EKLENDİ
-  final List<Map<String, String>> _languages = [
-    {'code': 'en_US', 'name': 'English', 'native': 'English'},
-    {'code': 'tr_TR', 'name': 'Turkish', 'native': 'Türkçe'},
-    {'code': 'es_ES', 'name': 'Spanish', 'native': 'Español'},
-    {'code': 'fr_FR', 'name': 'French', 'native': 'Français'},
-    {'code': 'de_DE', 'name': 'German', 'native': 'Deutsch'},
-    {'code': 'zh_CN', 'name': 'Chinese', 'native': '中文'},
-    {'code': 'hi_IN', 'name': 'Hindi', 'native': 'हिन्दी'},
-    {'code': 'ar_AR', 'name': 'Arabic', 'native': 'العربية'},
-    {'code': 'ru_RU', 'name': 'Russian', 'native': 'Русский'},
-    {'code': 'pt_BR', 'name': 'Portuguese', 'native': 'Português'},
-    {'code': 'id_ID', 'name': 'Indonesian', 'native': 'Bahasa Indonesia'},
-    {'code': 'ur_PK', 'name': 'Urdu', 'native': 'اردو'},
-    {'code': 'ja_JP', 'name': 'Japanese', 'native': '日本語'},
-    {'code': 'sw_TZ', 'name': 'Swahili', 'native': 'Kiswahili'},
-    {'code': 'bn_BD', 'name': 'Bengali', 'native': 'বাংলা'},
-    {'code': 'fi_FI', 'name': 'Kurmanci', 'native': 'Kurdî - Zarava Kurmancî'},
-    {'code': 'cs_CS', 'name': 'Zazakî', 'native': 'Kurdî - Zarava Zazakî'},
-  ];
-
-  // Dil arama için
-  final TextEditingController _languageSearchController = TextEditingController();
-  String _languageSearchQuery = '';
 
   @override
   void initState() {
@@ -368,20 +253,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _initDatabase();
     _checkPermission();
     _loadSearchHistory();
-    _languageProvider.loadLanguage();
     
     _intentChannel.setMethodCallHandler(_handleIntentMethodCall);
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _handleInitialIntent();
-    });
-
-    _languageSearchController.addListener(_onLanguageSearchChanged);
-  }
-
-  void _onLanguageSearchChanged() {
-    setState(() {
-      _languageSearchQuery = _languageSearchController.text.toLowerCase();
     });
   }
 
@@ -1373,14 +1249,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   Widget _buildDrawer() {
-    final filteredLanguages = _languageSearchQuery.isEmpty
-        ? _languages
-        : _languages.where((lang) =>
-            lang['name']!.toLowerCase().contains(_languageSearchQuery) ||
-            lang['native']!.toLowerCase().contains(_languageSearchQuery) ||
-            lang['code']!.toLowerCase().contains(_languageSearchQuery))
-        .toList();
-
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
@@ -1412,71 +1280,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
           
           // DİL SEÇİMİ BÖLÜMÜ
-          ExpansionTile(
-            leading: Icon(Icons.language, color: Color(0xFFD32F2F)),
-            title: Text(AppLocalizations.of(context).languages),
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
-                child: TextField(
-                  controller: _languageSearchController,
-                  decoration: InputDecoration(
-                    hintText: AppLocalizations.of(context).searchLanguage,
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
-                    isDense: true,
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 300,
-                child: filteredLanguages.isEmpty
-                    ? Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
-                            SizedBox(height: 16),
-                            Text(
-                              AppLocalizations.of(context).noLanguageFound,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        itemCount: filteredLanguages.length,
-                        itemBuilder: (context, index) {
-                          final language = filteredLanguages[index];
-                          final code = language['code']!;
-                          final isCurrent = _languageProvider.currentLanguage?.code == code;
-                          
-                          return ListTile(
-                            leading: Icon(Icons.flag, color: Color(0xFFD32F2F)),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(language['native']!, style: TextStyle(fontWeight: FontWeight.bold)),
-                                Text(language['name']!, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
-                              ],
-                            ),
-                            trailing: isCurrent ? Icon(Icons.check, color: Colors.green) : null,
-                            onTap: () {
-                              _languageProvider.changeLanguage(code);
-                              _languageSearchController.clear();
-                              _languageSearchQuery = '';
-                              Navigator.pop(context);
-                              setState(() {});
-                            },
-                          );
-                        },
-                      ),
-              ),
-            ],
+          Consumer<LanguageProvider>(
+            builder: (context, languageProvider, child) {
+              return ExpansionTile(
+                leading: Icon(Icons.language, color: Color(0xFFD32F2F)),
+                title: Text(AppLocalizations.of(context).languages),
+                children: [
+                  LanguageDialogContent(languageProvider: languageProvider),
+                ],
+              );
+            },
           ),
 
           _buildDrawerItem(Icons.info, AppLocalizations.of(context).about, _showAboutDialog),
@@ -1555,10 +1368,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         ],
       ),
     );
-  }
-
-  void _showLanguageSettings() {
-    LanguageDialog.show(context, _languageProvider);
   }
 
   void _showPrivacyPolicy() {
@@ -1757,7 +1566,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     _database?.close();
     _searchController.dispose();
     _searchFocusNode.dispose();
-    _languageSearchController.dispose();
     super.dispose();
   }
 }
@@ -1946,6 +1754,176 @@ class _ViewerScreenState extends State<ViewerScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// Provider için gerekli importlar
+import 'package:provider/provider.dart';
+
+// LanguageDialogContent widget'ı
+class LanguageDialogContent extends StatefulWidget {
+  final LanguageProvider languageProvider;
+
+  const LanguageDialogContent({super.key, required this.languageProvider});
+
+  @override
+  State<LanguageDialogContent> createState() => _LanguageDialogContentState();
+}
+
+class _LanguageDialogContentState extends State<LanguageDialogContent> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController.addListener(_onSearchChanged);
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text.toLowerCase();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final filteredLanguages = _searchQuery.isEmpty
+        ? AppLanguages.supportedLanguages
+        : AppLanguages.supportedLanguages.where((lang) =>
+            lang.name.toLowerCase().contains(_searchQuery) ||
+            lang.nativeName.toLowerCase().contains(_searchQuery) ||
+            lang.code.toLowerCase().contains(_searchQuery))
+        .toList();
+
+    return Column(
+      children: [
+        // Arama kutusu
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 6.0),
+          child: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: AppLocalizations.of(context).searchLanguage,
+              prefixIcon: Icon(Icons.search),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+              isDense: true,
+            ),
+          ),
+        ),
+        SizedBox(
+          height: 300,
+          child: filteredLanguages.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.search_off, size: 64, color: Colors.grey[400]),
+                      SizedBox(height: 16),
+                      Text(
+                        AppLocalizations.of(context).noLanguageFound,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : ListView(
+                  children: [
+                    // Sistem Dili Seçeneği
+                    FutureBuilder<bool>(
+                      future: AppLanguages.hasUserSelectedLanguage,
+                      builder: (context, snapshot) {
+                        final hasUserSelection = snapshot.data ?? false;
+                        return ListTile(
+                          leading: Icon(Icons.language, color: Color(0xFFD32F2F)),
+                          title: Text(
+                            AppLocalizations.of(context).systemLanguage,
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          subtitle: Text(AppLocalizations.of(context).sameAsDevice),
+                          trailing: !hasUserSelection 
+                              ? Icon(Icons.check, color: Color(0xFFD32F2F))
+                              : null,
+                          onTap: () async {
+                            await widget.languageProvider.resetToSystem();
+                            Navigator.pop(context);
+                            _showRestartMessage(context);
+                          },
+                        );
+                      },
+                    ),
+                    Divider(),
+                    
+                    // Desteklenen Diller
+                    ...filteredLanguages.map((language) => ListTile(
+                      leading: Text(
+                        language.flag,
+                        style: TextStyle(fontSize: 24),
+                      ),
+                      title: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            language.nativeName,
+                            style: TextStyle(fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            language.name,
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
+                      ),
+                      trailing: widget.languageProvider.currentLanguage?.code == language.code
+                          ? Icon(Icons.check, color: Color(0xFFD32F2F))
+                          : null,
+                      onTap: () async {
+                        await widget.languageProvider.changeLanguage(language.code);
+                        Navigator.pop(context);
+                        _showRestartMessage(context);
+                      },
+                    )).toList(),
+                  ],
+                ),
+        ),
+      ],
+    );
+  }
+
+  void _showRestartMessage(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.info, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                AppLocalizations.of(context).languageChangeRestart,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: Color(0xFFD32F2F),
+        duration: Duration(seconds: 3),
+        action: SnackBarAction(
+          label: AppLocalizations.of(context).restart,
+          textColor: Colors.white,
+          onPressed: () {
+            SystemNavigator.pop();
+          },
+        ),
       ),
     );
   }
