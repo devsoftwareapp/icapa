@@ -13,6 +13,7 @@ dependencies:
   file_picker: ^8.1.0
   flutter_inappwebview: ^6.1.5
   path_provider: ^2.1.5
+  intl: ^0.19.0
   path: ^1.8.3
   permission_handler: ^11.0.1
   device_info_plus: ^11.3.0
