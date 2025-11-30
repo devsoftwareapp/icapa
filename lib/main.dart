@@ -15,8 +15,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:printing/printing.dart';
 import 'package:open_file/open_file.dart';
 import 'package:sqflite/sqflite.dart';
+import 'package:provider/provider.dart'; // ← IMPORT EN ÜSTTE
 
-// Import generated localization - ARTIK AÇIK
+// Import generated localization
 import 'gen/l10n.dart';
 import 'tools_screen.dart';
 import 'app_languages.dart';
@@ -1758,9 +1759,6 @@ class _ViewerScreenState extends State<ViewerScreen> {
     );
   }
 }
-
-// Provider için gerekli importlar
-import 'package:provider/provider.dart';
 
 // LanguageDialogContent widget'ı
 class LanguageDialogContent extends StatefulWidget {
