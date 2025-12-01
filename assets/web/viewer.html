@@ -1019,7 +1019,7 @@ See https://github.com/adobe-type-tools/cmap-resources
     const fileParam = urlParams.get('file');
     if (fileParam && window.flutter_inappwebview) {
       const filename = decodeURIComponent(fileParam).split('/').pop() || 'document.pdf';
-      const updatedFilename = 'update_' + filename;
+      const updatedFilename = '' + filename;
       window.flutter_inappwebview.callHandler("onPdfSaved", updatedFilename, "");
     }
   });
