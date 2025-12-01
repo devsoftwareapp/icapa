@@ -226,7 +226,7 @@ class AppTranslations {
         'print': 'প্রিন্ট',
         'delete': 'মুছুন',
         'delete_title': 'ফাইল মুছুন',
-        'delete_message': '"$fileName" দলীয় মুছতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।',
+        'delete_message': 'দলীয় মুছতে চান? এই কাজটি পূর্বাবস্থায় ফেরানো যাবে না।',
         'confirm_delete': 'মুছুন',
         'cloud_storage': 'ক্লাউড স্টোরেজ',
         'email_integration': 'ইমেল ইন্টিগ্রেশন',
