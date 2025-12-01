@@ -801,91 +801,236 @@ See https://github.com/adobe-type-tools/cmap-resources
     </div> <!-- outerContainer -->
     <div id="printContainer"></div>
 
+
+
+      <!-- Kaydetme-->
+
+
 <!-- Flutter'a PDF kaydetme entegrasyonu -->
 <script>
-  // 🔄 Flutter'a haber veren fonksiyon
+  // 🔄 Flutter'a haber veren fonksiyon - GÜNCELLENDİ
   function notifyFlutterSave(filename, base64Data) {
     if (window.flutter_inappwebview) {
       window.flutter_inappwebview.callHandler("onPdfSaved", filename, base64Data);
+      console.log("✅ PDF Flutter'a gönderildi:", filename);
     } else {
-      console.log("Flutter handler not found");
+      console.log("⚠️ Flutter handler not found");
+      // Alternatif: dosyayı localStorage'a kaydet
+      localStorage.setItem('lastSavedPdf_' + Date.now(), JSON.stringify({
+        filename: filename,
+        data: base64Data
+      }));
     }
   }
 
   // PDF.js yüklendikten sonra kaydetme butonunu yakala
   document.addEventListener("webviewerloaded", () => {
     const attachSaveHandler = () => {
-      const saveBtn = document.querySelector("#download") || 
-                     document.querySelector("#secondaryDownload") ||
-                     document.querySelector("#downloadButton");
-      
-      if (saveBtn) {
-        console.log("Save button found, attaching handler");
-        
-        // Orijinal click event'ini sakla
-        const originalClick = saveBtn.onclick;
-        
-        saveBtn.addEventListener("click", async (e) => {
-          try {
-            const app = window.PDFViewerApplication;
-            if (!app || !app.pdfDocument) {
-              console.error("PDF.js not ready");
-              return;
-            }
+      // Tüm kaydetme butonlarını bul
+      const saveButtons = [
+        document.querySelector("#downloadButton"),
+        document.querySelector("#secondaryDownload"),
+        document.querySelector("#download"),
+        document.querySelector("button[data-l10n-id='pdfjs-save-button']")
+      ].filter(btn => btn);
 
-            // Orijinal dosya adını al veya yeni oluştur
-            const urlParams = new URLSearchParams(window.location.search);
-            const fileParam = urlParams.get('file');
-            let filename = "document.pdf";
-            
-            if (fileParam) {
-              try {
-                const decodedPath = decodeURIComponent(fileParam);
-                filename = decodedPath.split('/').pop() || filename;
-              } catch (err) {
-                console.error("Filename parsing error:", err);
+      if (saveButtons.length > 0) {
+        console.log("💾 Save buttons found:", saveButtons.length);
+        
+        saveButtons.forEach((saveBtn, index) => {
+          console.log(`Attaching handler to save button ${index + 1}`);
+          
+          // Orijinal click event'ini sakla
+          const originalClick = saveBtn.onclick;
+          
+          saveBtn.addEventListener("click", async (e) => {
+            try {
+              const app = window.PDFViewerApplication;
+              if (!app || !app.pdfDocument) {
+                console.error("PDF.js not ready");
+                return;
               }
+
+              // Orijinal dosya adını al veya yeni oluştur
+              const urlParams = new URLSearchParams(window.location.search);
+              const fileParam = urlParams.get('file');
+              let filename = "document.pdf";
+              
+              if (fileParam) {
+                try {
+                  const decodedPath = decodeURIComponent(fileParam);
+                  filename = decodedPath.split('/').pop() || filename;
+                  // Dosya adını temizle: "update_" prefix eklemek için
+                  const baseName = filename.replace(/\.pdf$/i, '');
+                  filename = baseName + '.pdf';
+                } catch (err) {
+                  console.error("Filename parsing error:", err);
+                }
+              }
+
+              console.log("📁 Saving PDF:", filename);
+
+              // 🧩 PDF.js'ten güncel PDF blob'unu al
+              try {
+                const data = await app.pdfDocument.saveDocument();
+                const blob = new Blob([data], { type: "application/pdf" });
+
+                // 📦 Blob'u Base64'e çevir
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                  const base64Data = reader.result.split(",")[1];
+                  // 🎯 ÖZEL DOSYA ADI: "update_" prefix ekle
+                  const updatedFilename = 'update_' + filename;
+                  notifyFlutterSave(updatedFilename, base64Data);
+                  
+                  // Başarı mesajı göster
+                  showToast('PDF Download/PDF Reader klasörüne kaydediliyor...');
+                };
+                reader.readAsDataURL(blob);
+
+              } catch (saveError) {
+                console.error("PDF save error:", saveError);
+                // Alternatif yaklaşım
+                try {
+                  const iframe = document.createElement('iframe');
+                  iframe.style.display = 'none';
+                  document.body.appendChild(iframe);
+                  
+                  setTimeout(() => {
+                    const updatedFilename = 'update_' + filename;
+                    notifyFlutterSave(updatedFilename, '');
+                    document.body.removeChild(iframe);
+                  }, 100);
+                } catch (fallbackError) {
+                  console.error("Fallback error:", fallbackError);
+                }
+              }
+
+              // Orijinal davranışı da çalıştır (indirme)
+              if (originalClick) {
+                try {
+                  originalClick.call(saveBtn, e);
+                } catch (e) {
+                  console.log("Original click error (ignored):", e);
+                }
+              }
+              
+            } catch (error) {
+              console.error("❌ Save error:", error);
             }
-
-            console.log("Saving PDF:", filename);
-
-            // 🧩 PDF.js'ten güncel dosya blob'unu al
-            const data = await app.pdfDocument.saveDocument();
-            const blob = new Blob([data], { type: "application/pdf" });
-
-            // 📦 Blob'u Base64'e çevir
-            const reader = new FileReader();
-            reader.onloadend = () => {
-              const base64Data = reader.result.split(",")[1];
-              notifyFlutterSave(filename, base64Data);
-            };
-            reader.readAsDataURL(blob);
-
-            // Orijinal davranışı da çalıştır (indirme)
-            if (originalClick) {
-              originalClick.call(saveBtn, e);
-            }
-            
-          } catch (error) {
-            console.error("Save error:", error);
-          }
+          });
         });
       } else {
         // Buton henüz yüklenmediyse tekrar dene
+        console.log("⏳ Save buttons not found, retrying...");
         setTimeout(attachSaveHandler, 500);
       }
     };
     
     attachSaveHandler();
+    
+    // PDF.js'in kendi kaydetme mekanizmasını da dinle
+    const originalSave = window.PDFViewerApplication && window.PDFViewerApplication.download;
+    if (window.PDFViewerApplication && originalSave) {
+      window.PDFViewerApplication.download = function(...args) {
+        console.log("📥 PDF.js download triggered");
+        
+        // Orijinal dosya adını al
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileParam = urlParams.get('file');
+        let filename = "document.pdf";
+        
+        if (fileParam) {
+          try {
+            const decodedPath = decodeURIComponent(fileParam);
+            filename = decodedPath.split('/').pop() || filename;
+            filename = filename.replace(/\.pdf$/i, '') + '.pdf';
+          } catch (err) {
+            console.error("Filename error:", err);
+          }
+        }
+        
+        // Flutter'a bildir (veri olmadan)
+        const updatedFilename = 'update_' + filename;
+        if (window.flutter_inappwebview) {
+          window.flutter_inappwebview.callHandler("onPdfSaved", updatedFilename, "");
+        }
+        
+        // Orijinal fonksiyonu çalıştır
+        return originalSave.apply(this, args);
+      };
+    }
   });
+
+  // Toast mesajı göster
+  function showToast(message) {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #D32F2F;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 8px;
+      z-index: 9999;
+      font-family: Arial, sans-serif;
+      font-size: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      animation: fadeIn 0.3s ease-in;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+      toast.style.animation = 'fadeOut 0.3s ease-out';
+      setTimeout(() => {
+        document.body.removeChild(toast);
+      }, 300);
+    }, 3000);
+  }
+
+  // CSS animasyonları ekle
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeOut {
+      from { opacity: 1; transform: translateY(0); }
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+  `;
+  document.head.appendChild(style);
 
   // Alternatif olarak, PDF.js'in kendi kaydetme mekanizmasını da dinleyebiliriz
   window.addEventListener('message', (event) => {
     if (event.data && event.data.type === 'SAVE_PDF') {
-      notifyFlutterSave(event.data.filename, event.data.data);
+      const filename = event.data.filename || 'document.pdf';
+      const updatedFilename = 'update_' + filename;
+      notifyFlutterSave(updatedFilename, event.data.data || '');
+    }
+  });
+
+  // Sayfa kapatılırken kontrol et
+  window.addEventListener('beforeunload', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const fileParam = urlParams.get('file');
+    if (fileParam && window.flutter_inappwebview) {
+      const filename = decodeURIComponent(fileParam).split('/').pop() || 'document.pdf';
+      const updatedFilename = 'update_' + filename;
+      window.flutter_inappwebview.callHandler("onPdfSaved", updatedFilename, "");
     }
   });
 </script>
+
+      
+
+
+
+
+
       
   </body>
 </html>
