@@ -1,1 +1,652 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="pdf-lib.min.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --container-bg: white;
+            --text-color: #333;
+            --border-color: #ddd;
+            --upload-border: #d32f2f;
+            --upload-bg: #fff;
+            --upload-hover: #ffebee;
+            --file-item-bg: #f9f9f9;
+            --progress-bg: #e3f2fd;
+            --success-bg: #e8f5e8;
+            --success-color: #2e7d32;
+        }
 
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #121212;
+                --container-bg: #1e1e1e;
+                --text-color: #ffffff;
+                --border-color: #444;
+                --upload-border: #d32f2f;
+                --upload-bg: #2d2d2d;
+                --upload-hover: #3a2a2a;
+                --file-item-bg: #2d2d2d;
+                --progress-bg: #1a3a4a;
+                --success-bg: #1a3a2a;
+                --success-color: #4caf50;
+            }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-color);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: var(--container-bg);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+        .upload-area {
+            border: 2px dashed var(--upload-border);
+            border-radius: 10px;
+            padding: 30px 20px;
+            text-align: center;
+            margin: 20px 0;
+            background: var(--upload-bg);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .upload-area:active {
+            background: var(--upload-hover);
+        }
+        .file-list {
+            margin: 20px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            margin: 8px 0;
+            background: var(--file-item-bg);
+            transition: all 0.3s ease;
+        }
+        .file-name {
+            flex-grow: 1;
+            font-size: 14px;
+            word-break: break-all;
+            color: var(--text-color);
+        }
+        .remove-btn {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .btn {
+            background: #d32f2f;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+            width: 100%;
+            max-width: 200px;
+            transition: all 0.3s ease;
+        }
+        .btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            background: #666;
+        }
+        .btn-success {
+            background: #388e3c;
+        }
+        .progress {
+            margin: 20px 0;
+            text-align: center;
+            padding: 15px;
+            background: var(--progress-bg);
+            border-radius: 8px;
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+        .success {
+            margin: 20px 0;
+            text-align: center;
+            padding: 15px;
+            background: var(--success-bg);
+            border-radius: 8px;
+            color: var(--success-color);
+            transition: all 0.3s ease;
+        }
+        .hidden {
+            display: none;
+        }
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        @media (min-width: 768px) {
+            .button-group {
+                flex-direction: row;
+                justify-content: center;
+            }
+            .btn {
+                width: auto;
+            }
+        }
+
+        /* Karanlık mod için ek stiller */
+        @media (prefers-color-scheme: dark) {
+            .remove-btn {
+                background: #c62828;
+            }
+            .btn {
+                background: #d32f2f;
+            }
+            .btn:disabled {
+                background: #555;
+            }
+            .btn-secondary {
+                background: #555;
+            }
+            .btn-success {
+                background: #2e7d32;
+            }
+            input[type="file"] {
+                filter: invert(1) hue-rotate(180deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Dosya Seçme Butonu -->
+        <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+            <h3 id="selectPdfFilesText"></h3>
+            <p id="clickToSelectText"></p>
+            <p><small id="multiplePdfText"></small></p>
+            <input type="file" id="fileInput" multiple accept=".pdf" class="hidden">
+        </div>
+
+        <!-- Seçilen Dosya Listesi -->
+        <div class="file-list" id="fileList"></div>
+
+        <!-- İlerleme Durumu -->
+        <div class="progress" id="progress" style="display: none;">
+            <p id="mergingPdfText"><span id="progressText">0%</span></p>
+        </div>
+
+        <!-- Başarılı Mesajı -->
+        <div class="success" id="success" style="display: none;">
+            <p id="successMessage"></p>
+        </div>
+
+        <!-- Butonlar -->
+        <div class="button-group">
+            <button class="btn" id="mergeBtn" disabled></button>
+            <button class="btn btn-secondary" id="clearBtn" disabled></button>
+            <button class="btn btn-success" id="saveBtn" style="display: none;"></button>
+        </div>
+    </div>
+
+    <script>
+        // JSON çevirileri - HTML içine gömülü
+        const translations = {
+            "tr": {
+                "selectPdfFiles": "PDF Dosyalarını Seçin",
+                "clickToSelect": "Tıklayarak PDF dosyalarını seçin",
+                "multiplePdf": "Birden fazla PDF seçebilirsiniz",
+                "mergePdf": "PDF BİRLEŞTİR",
+                "clearList": "LİSTEYİ TEMİZLE",
+                "save": "KAYDET",
+                "mergingPdf": "PDF'ler birleştiriliyor...",
+                "mergeSuccess": "PDF başarıyla birleştirildi!",
+                "saveSuccess": "PDF Başarıyla Kaydedildi<br><small>(Download/PDF Reader)</small>",
+                "remove": "Kaldır",
+                "selectAtLeast2": "En az 2 PDF dosyası seçin!"
+            },
+            "en": {
+                "selectPdfFiles": "Select PDF Files",
+                "clickToSelect": "Click to select PDF files",
+                "multiplePdf": "You can select multiple PDFs",
+                "mergePdf": "MERGE PDF",
+                "clearList": "CLEAR LIST",
+                "save": "SAVE",
+                "mergingPdf": "Merging PDFs...",
+                "mergeSuccess": "PDF merged successfully!",
+                "saveSuccess": "PDF Successfully Saved<br><small>(Download/PDF Reader)</small>",
+                "remove": "Remove",
+                "selectAtLeast2": "Select at least 2 PDF files!"
+            },
+            "de": {
+                "selectPdfFiles": "PDF-Dateien auswählen",
+                "clickToSelect": "Klicken Sie, um PDF-Dateien auszuwählen",
+                "multiplePdf": "Sie können mehrere PDFs auswählen",
+                "mergePdf": "PDF ZUSAMMENFÜHREN",
+                "clearList": "LISTE LÖSCHEN",
+                "save": "SPEICHERN",
+                "mergingPdf": "PDFs werden zusammengeführt...",
+                "mergeSuccess": "PDF erfolgreich zusammengeführt!",
+                "saveSuccess": "PDF erfolgreich gespeichert<br><small>(Download/PDF Reader)</small>",
+                "remove": "Entfernen",
+                "selectAtLeast2": "Wählen Sie mindestens 2 PDF-Dateien aus!"
+            },
+            "es": {
+                "selectPdfFiles": "Seleccionar archivos PDF",
+                "clickToSelect": "Haga clic para seleccionar archivos PDF",
+                "multiplePdf": "Puede seleccionar varios PDF",
+                "mergePdf": "COMBINAR PDF",
+                "clearList": "LIMPIAR LISTA",
+                "save": "GUARDAR",
+                "mergingPdf": "Combinando PDFs...",
+                "mergeSuccess": "¡PDF combinado exitosamente!",
+                "saveSuccess": "PDF guardado exitosamente<br><small>(Descargar/PDF Reader)</small>",
+                "remove": "Eliminar",
+                "selectAtLeast2": "¡Seleccione al menos 2 archivos PDF!"
+            },
+            "fr": {
+                "selectPdfFiles": "Sélectionner les fichiers PDF",
+                "clickToSelect": "Cliquez pour sélectionner les fichiers PDF",
+                "multiplePdf": "Vous pouvez sélectionner plusieurs PDF",
+                "mergePdf": "FUSIONNER PDF",
+                "clearList": "EFFACER LA LISTE",
+                "save": "ENREGISTRER",
+                "mergingPdf": "Fusion des PDF...",
+                "mergeSuccess": "PDF fusionné avec succès !",
+                "saveSuccess": "PDF enregistré avec succès<br><small>(Télécharger/PDF Reader)</small>",
+                "remove": "Supprimer",
+                "selectAtLeast2": "Sélectionnez au moins 2 fichiers PDF !"
+            },
+            "ru": {
+                "selectPdfFiles": "Выберите PDF файлы",
+                "clickToSelect": "Нажмите, чтобы выбрать PDF файлы",
+                "multiplePdf": "Вы можете выбрать несколько PDF",
+                "mergePdf": "ОБЪЕДИНИТЬ PDF",
+                "clearList": "ОЧИСТИТЬ СПИСОК",
+                "save": "СОХРАНИТЬ",
+                "mergingPdf": "Объединение PDF...",
+                "mergeSuccess": "PDF успешно объединен!",
+                "saveSuccess": "PDF успешно сохранен<br><small>(Загрузки/PDF Reader)</small>",
+                "remove": "Удалить",
+                "selectAtLeast2": "Выберите хотя бы 2 PDF файла!"
+            },
+            "ar": {
+                "selectPdfFiles": "اختر ملفات PDF",
+                "clickToSelect": "انقر لاختيار ملفات PDF",
+                "multiplePdf": "يمكنك اختيار عدة ملفات PDF",
+                "mergePdf": "دمج PDF",
+                "clearList": "مسح القائمة",
+                "save": "حفظ",
+                "mergingPdf": "جاري دمج ملفات PDF...",
+                "mergeSuccess": "تم دمج PDF بنجاح!",
+                "saveSuccess": "تم حفظ PDF بنجاح<br><small>(التنزيلات/قارئ PDF)</small>",
+                "remove": "إزالة",
+                "selectAtLeast2": "اختر ملفين PDF على الأقل!"
+            },
+            "zh": {
+                "selectPdfFiles": "选择PDF文件",
+                "clickToSelect": "点击选择PDF文件",
+                "multiplePdf": "您可以选择多个PDF文件",
+                "mergePdf": "合并PDF",
+                "clearList": "清空列表",
+                "save": "保存",
+                "mergingPdf": "正在合并PDF...",
+                "mergeSuccess": "PDF合并成功！",
+                "saveSuccess": "PDF保存成功<br><small>(下载/PDF阅读器)</small>",
+                "remove": "移除",
+                "selectAtLeast2": "请选择至少2个PDF文件！"
+            },
+            "ja": {
+                "selectPdfFiles": "PDFファイルを選択",
+                "clickToSelect": "クリックしてPDFファイルを選択",
+                "multiplePdf": "複数のPDFを選択できます",
+                "mergePdf": "PDFを結合",
+                "clearList": "リストをクリア",
+                "save": "保存",
+                "mergingPdf": "PDFを結合中...",
+                "mergeSuccess": "PDFの結合に成功しました！",
+                "saveSuccess": "PDFの保存に成功しました<br><small>(ダウンロード/PDFリーダー)</small>",
+                "remove": "削除",
+                "selectAtLeast2": "少なくとも2つのPDFファイルを選択してください！"
+            },
+            "pt": {
+                "selectPdfFiles": "Selecionar arquivos PDF",
+                "clickToSelect": "Clique para selecionar arquivos PDF",
+                "multiplePdf": "Você pode selecionar vários PDFs",
+                "mergePdf": "MESCLAR PDF",
+                "clearList": "LIMPAR LISTA",
+                "save": "SALVAR",
+                "mergingPdf": "Mesclando PDFs...",
+                "mergeSuccess": "PDF mesclado com sucesso!",
+                "saveSuccess": "PDF salvo com sucesso<br><small>(Download/PDF Reader)</small>",
+                "remove": "Remover",
+                "selectAtLeast2": "Selecione pelo menos 2 arquivos PDF!"
+            },
+            "hi": {
+                "selectPdfFiles": "PDF फ़ाइलें चुनें",
+                "clickToSelect": "PDF फ़ाइलें चुनने के लिए क्लिक करें",
+                "multiplePdf": "आप एक से अधिक PDF चुन सकते हैं",
+                "mergePdf": "PDF मर्ज करें",
+                "clearList": "सूची साफ करें",
+                "save": "सहेजें",
+                "mergingPdf": "PDF मर्ज किए जा रहे हैं...",
+                "mergeSuccess": "PDF सफलतापूर्वक मर्ज हो गया!",
+                "saveSuccess": "PDF सफलतापूर्वक सहेजा गया<br><small>(डाउनलोड/PDF रीडर)</small>",
+                "remove": "हटाएं",
+                "selectAtLeast2": "कम से कम 2 PDF फ़ाइलें चुनें!"
+            },
+            "bn": {
+                "selectPdfFiles": "PDF ফাইল নির্বাচন করুন",
+                "clickToSelect": "PDF ফাইল নির্বাচন করতে ক্লিক করুন",
+                "multiplePdf": "আপনি একাধিক PDF নির্বাচন করতে পারেন",
+                "mergePdf": "PDF মার্জ করুন",
+                "clearList": "তালিকা সাফ করুন",
+                "save": "সংরক্ষণ করুন",
+                "mergingPdf": "PDF মার্জ করা হচ্ছে...",
+                "mergeSuccess": "PDF সফলভাবে মার্জ হয়েছে!",
+                "saveSuccess": "PDF সফলভাবে সংরক্ষিত হয়েছে<br><small>(ডাউনলোড/PDF রিডার)</small>",
+                "remove": "অপসারণ",
+                "selectAtLeast2": "অন্তত 2টি PDF ফাইল নির্বাচন করুন!"
+            },
+            "id": {
+                "selectPdfFiles": "Pilih File PDF",
+                "clickToSelect": "Klik untuk memilih file PDF",
+                "multiplePdf": "Anda dapat memilih beberapa PDF",
+                "mergePdf": "GABUNGKAN PDF",
+                "clearList": "HAPUS DAFTAR",
+                "save": "SIMPAN",
+                "mergingPdf": "Menggabungkan PDF...",
+                "mergeSuccess": "PDF berhasil digabungkan!",
+                "saveSuccess": "PDF Berhasil Disimpan<br><small>(Download/PDF Reader)</small>",
+                "remove": "Hapus",
+                "selectAtLeast2": "Pilih setidaknya 2 file PDF!"
+            },
+            "ku": {
+                "selectPdfFiles": "Pelê PDF-ê hilbijêrin",
+                "clickToSelect": "Ji bo hilbijartina pelê PDF-ê bikirtînin",
+                "multiplePdf": "Hûn dikarin çend PDF-ê hilbijêrin",
+                "mergePdf": "PDF-Ê TEVLÎ HEV BIKE",
+                "clearList": "LÎSTEYÊ PAK BIKE",
+                "save": "TOMAR BIKE",
+                "mergingPdf": "PDF-ê têne tevlîhevkirin...",
+                "mergeSuccess": "PDF bi serketî hate tevlîhevkirin!",
+                "saveSuccess": "PDF bi serketî hate tomarkirin<br><small>(Daxistin/PDF Reader)</small>",
+                "remove": "Rakê",
+                "selectAtLeast2": "Bi kêmî 2 pelê PDF-ê hilbijêrin!"
+            },
+            "ur": {
+                "selectPdfFiles": "PDF فائلیں منتخب کریں",
+                "clickToSelect": "PDF فائلیں منتخب کرنے کے لیے کلک کریں",
+                "multiplePdf": "آپ ایک سے زیادہ PDF منتخب کر سکتے ہیں",
+                "mergePdf": "PDF ملا دیں",
+                "clearList": "فہرست صاف کریں",
+                "save": "محفوظ کریں",
+                "mergingPdf": "PDF ملائے جا رہے ہیں...",
+                "mergeSuccess": "PDF کامیابی سے ملا دیا گیا!",
+                "saveSuccess": "PDF کامیابی سے محفوظ ہو گیا<br><small>(ڈاؤن لوڈ/PDF ریڈر)</small>",
+                "remove": "ہٹا دیں",
+                "selectAtLeast2": "کم از کم 2 PDF فائلیں منتخب کریں!"
+            },
+            "sw": {
+                "selectPdfFiles": "Chagua faili za PDF",
+                "clickToSelect": "Bonyeza kuchagua faili za PDF",
+                "multiplePdf": "Unaweza kuchagua PDF nyingi",
+                "mergePdf": "UNGA PDF",
+                "clearList": "FUTA ORODHA",
+                "save": "HIFADHI",
+                "mergingPdf": "Inaunganisha PDF...",
+                "mergeSuccess": "PDF imeunganishwa kikamilifu!",
+                "saveSuccess": "PDF imehifadhiwa kikamilifu<br><small>(Pakua/PDF Reader)</small>",
+                "remove": "Ondoa",
+                "selectAtLeast2": "Chagua angalau faili 2 za PDF!"
+            },
+            "za": {
+                "selectPdfFiles": "PDF dosyayan weçiné",
+                "clickToSelect": "PDF dosyayan weçiné ra tiknayé",
+                "multiplePdf": "Şima şené PDFyé zaféri weçiné",
+                "mergePdf": "PDFYAN PÊRO PÊ KERÉ",
+                "clearList": "LÎSTE PAK KE",
+                "save": "QEYD KE",
+                "mergingPdf": "PDFyan pêro pê bené...",
+                "mergeSuccess": "PDFyan bi serkewteyî pêro pê biy!",
+                "saveSuccess": "PDF bi serkewteyî qeyd biy<br><small>(Daxistin/PDF Reader)</small>",
+                "remove": "Jê bibe",
+                "selectAtLeast2": "Taybetî 2 dosyayé PDFyan weçiné!"
+            }
+        };
+
+        let selectedFiles = [];
+        let mergedPdfBlob = null;
+        const isFlutter = typeof window.flutter_inappwebview !== 'undefined';
+
+        // UI metinlerini güncelle
+        function updateUIText() {
+            // Lang.js'den mevcut dili al
+            const currentLang = languageConfig.getCurrent();
+            const t = translations[currentLang] || translations['en'];
+            
+            console.log('UI güncelleniyor, dil:', currentLang);
+            
+            // Elementleri güncelle
+            document.getElementById('selectPdfFilesText').textContent = t.selectPdfFiles;
+            document.getElementById('clickToSelectText').textContent = t.clickToSelect;
+            document.getElementById('multiplePdfText').textContent = t.multiplePdf;
+            document.getElementById('mergeBtn').textContent = t.mergePdf;
+            document.getElementById('clearBtn').textContent = t.clearList;
+            document.getElementById('saveBtn').textContent = t.save;
+            document.getElementById('mergingPdfText').innerHTML = t.mergingPdf + ' <span id="progressText">0%</span>';
+            
+            // Remove butonlarını güncelle
+            document.querySelectorAll('.remove-btn').forEach(btn => {
+                btn.textContent = t.remove;
+            });
+        }
+
+        // Sayfa yüklendiğinde
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Sayfa yüklendi, mevcut dil:', languageConfig.getCurrent());
+            updateUIText();
+            
+            // Dosya seçildiğinde
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                const files = Array.from(e.target.files);
+                addFilesToList(files);
+            });
+
+            // Sistem temasını dinle
+            const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            darkModeMediaQuery.addListener(handleColorSchemeChange);
+        });
+
+        function handleColorSchemeChange(e) {
+            console.log('Tema değişti:', e.matches ? 'karanlık' : 'açık');
+        }
+
+        // Dosyaları listeye ekle
+        function addFilesToList(files) {
+            files.forEach(file => {
+                if (file.type === 'application/pdf') {
+                    selectedFiles.push(file);
+                }
+            });
+            updateFileList();
+            updateButtons();
+        }
+
+        // Dosya listesini güncelle
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+
+            const currentLang = languageConfig.getCurrent();
+            const t = translations[currentLang] || translations['en'];
+
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <span class="file-name">${file.name}</span>
+                    <button class="remove-btn" onclick="removeFile(${index})">${t.remove}</button>
+                `;
+                fileList.appendChild(fileItem);
+            });
+        }
+
+        // Dosyayı listeden kaldır
+        function removeFile(index) {
+            selectedFiles.splice(index, 1);
+            updateFileList();
+            updateButtons();
+            hideSuccess();
+        }
+
+        // Buton durumlarını güncelle
+        function updateButtons() {
+            const mergeBtn = document.getElementById('mergeBtn');
+            const clearBtn = document.getElementById('clearBtn');
+            
+            mergeBtn.disabled = selectedFiles.length < 2;
+            clearBtn.disabled = selectedFiles.length === 0;
+        }
+
+        // Başarı mesajını gizle
+        function hideSuccess() {
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('saveBtn').style.display = 'none';
+            mergedPdfBlob = null;
+        }
+
+        // Başarı mesajını güncelle
+        function updateSuccessMessage(message) {
+            document.getElementById('successMessage').innerHTML = message;
+        }
+
+        // Listeyi temizle
+        document.getElementById('clearBtn').addEventListener('click', function() {
+            selectedFiles = [];
+            updateFileList();
+            updateButtons();
+            hideSuccess();
+        });
+
+        // PDF'leri birleştir
+        document.getElementById('mergeBtn').addEventListener('click', async function() {
+            const currentLang = languageConfig.getCurrent();
+            const t = translations[currentLang] || translations['en'];
+            
+            if (selectedFiles.length < 2) {
+                alert(t.selectAtLeast2);
+                return;
+            }
+
+            const progress = document.getElementById('progress');
+            const progressText = document.getElementById('progressText');
+            const mergeBtn = document.getElementById('mergeBtn');
+            
+            progress.style.display = 'block';
+            mergeBtn.disabled = true;
+            progressText.textContent = '0%';
+
+            try {
+                const { PDFDocument } = PDFLib;
+                const mergedPdf = await PDFDocument.create();
+
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdfDoc = await PDFDocument.load(arrayBuffer);
+                    const pages = await mergedPdf.copyPages(pdfDoc, pdfDoc.getPageIndices());
+                    pages.forEach(page => mergedPdf.addPage(page));
+                    
+                    const progressPercent = Math.round(((i + 1) / selectedFiles.length) * 100);
+                    progressText.textContent = `${progressPercent}%`;
+                }
+
+                const mergedPdfBytes = await mergedPdf.save();
+                mergedPdfBlob = new Blob([mergedPdfBytes], { type: 'application/pdf' });
+                
+                progress.style.display = 'none';
+                updateSuccessMessage(t.mergeSuccess);
+                document.getElementById('success').style.display = 'block';
+                document.getElementById('saveBtn').style.display = 'block';
+                
+            } catch (error) {
+                console.error('PDF birleştirme hatası:', error);
+                alert('PDF birleştirme sırasında hata oluştu: ' + error.message);
+                progress.style.display = 'none';
+            } finally {
+                mergeBtn.disabled = false;
+            }
+        });
+
+        // KAYDET butonu işlemi
+        document.getElementById('saveBtn').addEventListener('click', function() {
+            const currentLang = languageConfig.getCurrent();
+            const t = translations[currentLang] || translations['en'];
+            
+            if (!mergedPdfBlob) {
+                alert('Önce PDF birleştirin!');
+                return;
+            }
+
+            if (isFlutter) {
+                const reader = new FileReader();
+                reader.onload = function() {
+                    const base64data = reader.result.split(',')[1];
+                    window.flutter_inappwebview.callHandler('pdfMerged', {
+                        pdfData: base64data,
+                        fileName: 'merge.pdf'
+                    });
+                    
+                    updateSuccessMessage(t.saveSuccess);
+                    document.getElementById('saveBtn').style.display = 'none';
+                };
+                reader.readAsDataURL(mergedPdfBlob);
+            } else {
+                const url = URL.createObjectURL(mergedPdfBlob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'merge.pdf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                updateSuccessMessage(t.saveSuccess);
+                document.getElementById('saveBtn').style.display = 'none';
+            }
+        });
+
+        // Flutter'dan mesaj dinleme
+        if (isFlutter) {
+            window.addEventListener('flutterInAppWebViewPlatformReady', function() {
+                console.log('Flutter WebView hazır');
+            });
+        }
+    </script>
+</body>
+</html>

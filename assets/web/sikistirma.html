@@ -1,1 +1,1262 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="pdf-lib.min.js"></script>
+    <script src="pdf.min.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --primary-color: #e74c3c;
+            --primary-dark: #c0392b;
+            --success-color: #27ae60;
+            --success-dark: #219a52;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(231, 76, 60, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #e74c3c;
+                --primary-dark: #c0392b;
+                --success-color: #27ae60;
+                --success-dark: #219a52;
+                --text-color: #f0f0f0;
+                --text-light: #b0b0b0;
+                --bg-color: #1a1a1a;
+                --bg-secondary: #2d2d2d;
+                --bg-tertiary: #3a3a3a;
+                --border-color: #444444;
+                --shadow-color: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            background: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            padding: 15px;
+            margin: 10px auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(231, 76, 60, 0.05);
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .upload-area:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: var(--primary-dark);
+        }
+
+        .upload-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px auto;
+            color: var(--primary-color);
+        }
+
+        .upload-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-text {
+            color: var(--primary-color);
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .upload-subtext {
+            color: var(--text-light);
+            font-size: 11px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .file-info.visible {
+            display: block;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .info-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .compression-slider-container {
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .slider-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .slider-value {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .compression-slider {
+            width: 100%;
+            height: 8px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: var(--bg-tertiary);
+            border-radius: 4px;
+            outline: none;
+        }
+
+        .compression-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid var(--bg-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .compression-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            border: 2px solid var(--bg-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .slider-marks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        .mark {
+            text-align: center;
+            flex: 1;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            height: 6px;
+            margin: 12px 0;
+            overflow: hidden;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .progress-container.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .compress-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .compress-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .compress-btn:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .result.visible {
+            display: block;
+        }
+
+        .result.success {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .result.error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .download-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background: var(--success-dark);
+            transform: translateY(-1px);
+        }
+
+        .size-compare {
+            margin-top: 8px;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .size-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 3px 0;
+        }
+
+        .savings {
+            color: var(--success-color);
+            font-weight: bold;
+        }
+
+        .negative-savings {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 0;
+            gap: 10px;
+        }
+
+        .bottom-space {
+            height: 10px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+                margin: 5px auto;
+            }
+            
+            .upload-area {
+                padding: 12px 8px;
+            }
+            
+            .upload-icon {
+                width: 45px;
+                height: 45px;
+                margin-bottom: 8px;
+            }
+            
+            .compress-btn {
+                padding: 10px;
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .bottom-space {
+                height: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-area">
+            <!-- ÜST KISIM: PDF Alanı ve Bilgiler -->
+            <div>
+                <!-- PDF Yükleme Alanı -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <svg version="1.0" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" preserveAspectRatio="xMidYMid meet">
+                            <g transform="translate(0,512) scale(0.1,-0.1)" fill="currentColor" stroke="none">
+                                <path d="M1115 5092 c-113 -38 -188 -85 -275 -172 -54 -54 -87 -98 -118 -156 -84 -163 -77 31 -77 -2204 0 -1630 2 -1995 13 -2040 8 -30 34 -97 59 -149 79 -165 225 -289 410 -347 l78 -24 1355 0 1355 0 77 24 c175 54 330 180 406 332 84 167 77 8 77 1729 l0 1530 -722 3 -723 2 0 742 0 742 33 -30 32 -29 -34 38 -35 37 -915 0 -916 0 -80 -28z m115 -2547 c0 -88 31 -1429 33 -1430 2 -2 1491 21 1885 28 l282 5 0 -89 c0 -49 -1 -89 -2 -89 -16 -3 -1890 -29 -2084 -30 l-260 0 -12 648 c-7 356 -15 724 -19 819 l-6 172 54 4 c30 2 71 4 92 5 l37 2 0 -45z m630 -315 c165 -31 261 -156 247 -320 -16 -190 -144 -280 -399 -280 l-78 0 0 -165 0 -165 -125 0 -125 0 0 463 c0 255 3 467 7 470 10 11 415 8 473 -3z m840 -15 c182 -58 288 -171 319 -339 41 -227 -40 -420 -216 -514 -97 -52 -162 -62 -395 -62 l-208 0 0 463 c0 255 3 467 8 471 4 5 104 6 222 3 167 -3 227 -8 270 -22z m1115 -80 l0 -100 -212 -3 -213 -2 0 -75 0 -75 170 0 170 0 0 -100 0 -100 -170 0 -170 0 0 -190 0 -190 -120 0 -120 0 0 470 0 470 333 -2 332 -3 0 -100z"/>
+                                <path d="M1630 1935 l0 -95 74 0 c40 0 87 5 105 11 68 24 80 122 18 159 -25 16 -50 20 -114 20 l-83 0 0 -95z"/>
+                                <path d="M2440 1770 l0 -260 73 0 c185 0 274 91 270 273 -4 159 -106 247 -288 247 l-55 0 0 -260z"/>
+                            </g>
+                        </svg>
+                    </div>
+                    <div class="upload-text" data-i18n="select_pdf">PDF'Yİ SEÇİN</div>
+                    <div class="upload-subtext" data-i18n="select_pdf_description">Sıkıştırmak için PDF dosyasını seçin</div>
+                    <input type="file" id="fileInput" accept=".pdf">
+                </div>
+
+                <!-- Dosya Bilgileri -->
+                <div class="file-info" id="fileInfo">
+                    <div class="info-row">
+                        <span class="info-label" data-i18n="file_name">Dosya Adı:</span>
+                        <span class="info-value" id="fileName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" data-i18n="file_size">Boyut:</span>
+                        <span class="info-value" id="fileSize">-</span>
+                    </div>
+                </div>
+
+                <!-- Sonuç -->
+                <div class="result" id="result"></div>
+                
+                <!-- Boyut Karşılaştırma -->
+                <div id="sizeCompare" class="size-compare" style="display: none;"></div>
+            </div>
+
+            <!-- ALT KISIM: Kaydırmalı Seviye ve Buton -->
+            <div>
+                <!-- Kaydırmalı Sıkıştırma Seviyesi -->
+                <div class="compression-slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label" data-i18n="compression_level">Sıkıştırma Seviyesi</span>
+                        <span class="slider-value" id="compressionValue">Orta (%50)</span>
+                    </div>
+                    <input type="range" 
+                           min="1" 
+                           max="3" 
+                           value="2" 
+                           class="compression-slider" 
+                           id="compressionSlider">
+                    <div class="slider-marks">
+                        <div class="mark" data-i18n="low_quality">Düşük (%40)<br>Yüksek Kalite</div>
+                        <div class="mark" data-i18n="medium_quality">Orta (%50)<br>Orta Kalite</div>
+                        <div class="mark" data-i18n="high_quality">Yüksek (%70)<br>Düşük Kalite</div>
+                    </div>
+                </div>
+
+                <!-- İlerleme Çubuğu -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <!-- Sıkıştır Butonu -->
+                <button class="compress-btn" id="compressBtn" disabled data-i18n="compress">SIKIŞTIR</button>
+                
+                <!-- Alt Boşluk -->
+                <div class="bottom-space"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dil çevirileri JSON olarak gömülü
+        const translations = {
+            tr: {
+                select_pdf: "PDF'Yİ SEÇİN",
+                select_pdf_description: "Sıkıştırmak için PDF dosyasını seçin",
+                file_name: "Dosya Adı:",
+                file_size: "Boyut:",
+                compression_level: "Sıkıştırma Seviyesi",
+                compress: "SIKIŞTIR",
+                low_quality: "Düşük (%40)<br>Yüksek Kalite",
+                medium_quality: "Orta (%50)<br>Orta Kalite",
+                high_quality: "Yüksek (%70)<br>Düşük Kalite",
+                please_select_pdf: "Lütfen bir PDF dosyası seçin!",
+                pdf_uploaded_success: "PDF başarıyla yüklendi!",
+                converting_to_photos: "📖 PDF fotoğraflara çevriliyor...",
+                converting_pages: "🖼️ {{pages}} sayfa fotoğrafa dönüştürülüyor...",
+                creating_new_pdf: "📄 Yeni PDF oluşturuluyor...",
+                processing_page: "📸 Sayfa {{current}}/{{total}} işlendi...",
+                compression_success: "✅ Başarıyla sıkıştırıldı! %{{reduction}} küçüldü.",
+                already_optimized: "ℹ️ PDF zaten optimize edilmiş.",
+                save_file: "💾 KAYDET",
+                file_saved: "✅ PDF başarıyla kaydedildi!",
+                file_downloaded: "✅ PDF başarıyla indirildi!",
+                error_compressing: "❌ Hata: PDF sıkıştırılamadı",
+                previous_size: "📦 Önceki boyut:",
+                new_size: "📉 Yeni boyut:",
+                size_change: "💾 Boyut değişimi:"
+            },
+            en: {
+                select_pdf: "SELECT PDF",
+                select_pdf_description: "Select PDF file to compress",
+                file_name: "File Name:",
+                file_size: "Size:",
+                compression_level: "Compression Level",
+                compress: "COMPRESS",
+                low_quality: "Low (%40)<br>High Quality",
+                medium_quality: "Medium (%50)<br>Medium Quality",
+                high_quality: "High (%70)<br>Low Quality",
+                please_select_pdf: "Please select a PDF file!",
+                pdf_uploaded_success: "PDF uploaded successfully!",
+                converting_to_photos: "📖 Converting PDF to photos...",
+                converting_pages: "🖼️ Converting {{pages}} pages to photos...",
+                creating_new_pdf: "📄 Creating new PDF...",
+                processing_page: "📸 Processing page {{current}}/{{total}}...",
+                compression_success: "✅ Successfully compressed! Reduced by %{{reduction}}.",
+                already_optimized: "ℹ️ PDF is already optimized.",
+                save_file: "💾 SAVE",
+                file_saved: "✅ PDF saved successfully!",
+                file_downloaded: "✅ PDF downloaded successfully!",
+                error_compressing: "❌ Error: Could not compress PDF",
+                previous_size: "📦 Previous size:",
+                new_size: "📉 New size:",
+                size_change: "💾 Size change:"
+            },
+            fr: {
+                select_pdf: "SÉLECTIONNER PDF",
+                select_pdf_description: "Sélectionnez le fichier PDF à compresser",
+                file_name: "Nom du fichier:",
+                file_size: "Taille:",
+                compression_level: "Niveau de compression",
+                compress: "COMPRESSER",
+                low_quality: "Faible (%40)<br>Haute qualité",
+                medium_quality: "Moyen (%50)<br>Qualité moyenne",
+                high_quality: "Élevé (%70)<br>Faible qualité",
+                please_select_pdf: "Veuillez sélectionner un fichier PDF!",
+                pdf_uploaded_success: "PDF téléchargé avec succès!",
+                converting_to_photos: "📖 Conversion du PDF en photos...",
+                converting_pages: "🖼️ Conversion de {{pages}} pages en photos...",
+                creating_new_pdf: "📄 Création du nouveau PDF...",
+                processing_page: "📸 Traitement de la page {{current}}/{{total}}...",
+                compression_success: "✅ Compressé avec succès! Réduction de %{{reduction}}.",
+                already_optimized: "ℹ️ Le PDF est déjà optimisé.",
+                save_file: "💾 SAUVEGARDER",
+                file_saved: "✅ PDF sauvegardé avec succès!",
+                file_downloaded: "✅ PDF téléchargé avec succès!",
+                error_compressing: "❌ Erreur: Impossible de compresser le PDF",
+                previous_size: "📦 Taille précédente:",
+                new_size: "📉 Nouvelle taille:",
+                size_change: "💾 Changement de taille:"
+            },
+            de: {
+                select_pdf: "PDF AUSWÄHLEN",
+                select_pdf_description: "Wählen Sie eine PDF-Datei zum Komprimieren aus",
+                file_name: "Dateiname:",
+                file_size: "Größe:",
+                compression_level: "Komprimierungsstufe",
+                compress: "KOMPRIMIEREN",
+                low_quality: "Niedrig (%40)<br>Hohe Qualität",
+                medium_quality: "Mittel (%50)<br>Mittlere Qualität",
+                high_quality: "Hoch (%70)<br>Niedrige Qualität",
+                please_select_pdf: "Bitte wählen Sie eine PDF-Datei aus!",
+                pdf_uploaded_success: "PDF erfolgreich hochgeladen!",
+                converting_to_photos: "📖 PDF wird in Fotos umgewandelt...",
+                converting_pages: "🖼️ {{pages}} Seiten werden in Fotos umgewandelt...",
+                creating_new_pdf: "📄 Neue PDF wird erstellt...",
+                processing_page: "📸 Seite {{current}}/{{total}} wird verarbeitet...",
+                compression_success: "✅ Erfolgreich komprimiert! Um %{{reduction}} reduziert.",
+                already_optimized: "ℹ️ PDF ist bereits optimiert.",
+                save_file: "💾 SPEICHERN",
+                file_saved: "✅ PDF erfolgreich gespeichert!",
+                file_downloaded: "✅ PDF erfolgreich heruntergeladen!",
+                error_compressing: "❌ Fehler: PDF konnte nicht komprimiert werden",
+                previous_size: "📦 Vorherige Größe:",
+                new_size: "📉 Neue Größe:",
+                size_change: "💾 Größenänderung:"
+            },
+            es: {
+                select_pdf: "SELECCIONAR PDF",
+                select_pdf_description: "Seleccione el archivo PDF para comprimir",
+                file_name: "Nombre del archivo:",
+                file_size: "Tamaño:",
+                compression_level: "Nivel de compresión",
+                compress: "COMPRIMIR",
+                low_quality: "Bajo (%40)<br>Alta calidad",
+                medium_quality: "Medio (%50)<br>Calidad media",
+                high_quality: "Alto (%70)<br>Baja calidad",
+                please_select_pdf: "¡Por favor seleccione un archivo PDF!",
+                pdf_uploaded_success: "¡PDF cargado exitosamente!",
+                converting_to_photos: "📖 Convirtiendo PDF a fotos...",
+                converting_pages: "🖼️ Convirtiendo {{pages}} páginas a fotos...",
+                creating_new_pdf: "📄 Creando nuevo PDF...",
+                processing_page: "📸 Procesando página {{current}}/{{total}}...",
+                compression_success: "✅ ¡Comprimido exitosamente! Reducido en %{{reduction}}.",
+                already_optimized: "ℹ️ El PDF ya está optimizado.",
+                save_file: "💾 GUARDAR",
+                file_saved: "✅ ¡PDF guardado exitosamente!",
+                file_downloaded: "✅ ¡PDF descargado exitosamente!",
+                error_compressing: "❌ Error: No se pudo comprimir el PDF",
+                previous_size: "📦 Tamaño anterior:",
+                new_size: "📉 Nuevo tamaño:",
+                size_change: "💾 Cambio de tamaño:"
+            },
+            ar: {
+                select_pdf: "اختر ملف PDF",
+                select_pdf_description: "اختر ملف PDF لضغطه",
+                file_name: "اسم الملف:",
+                file_size: "الحجم:",
+                compression_level: "مستوى الضغط",
+                compress: "ضغط",
+                low_quality: "منخفض (%40)<br>جودة عالية",
+                medium_quality: "متوسط (%50)<br>جودة متوسطة",
+                high_quality: "عالي (%70)<br>جودة منخفضة",
+                please_select_pdf: "الرجاء اختيار ملف PDF!",
+                pdf_uploaded_success: "تم رفع PDF بنجاح!",
+                converting_to_photos: "📖 تحويل PDF إلى صور...",
+                converting_pages: "🖼️ تحويل {{pages}} صفحة إلى صور...",
+                creating_new_pdf: "📄 إنشاء PDF جديد...",
+                processing_page: "📸 معالجة الصفحة {{current}}/{{total}}...",
+                compression_success: "✅ تم الضغط بنجاح! تم التخفيض بنسبة %{{reduction}}.",
+                already_optimized: "ℹ️ ملف PDF محسن بالفعل.",
+                save_file: "💾 حفظ",
+                file_saved: "✅ تم حفظ PDF بنجاح!",
+                file_downloaded: "✅ تم تحميل PDF بنجاح!",
+                error_compressing: "❌ خطأ: تعذر ضغط PDF",
+                previous_size: "📦 الحجم السابق:",
+                new_size: "📉 الحجم الجديد:",
+                size_change: "💾 تغيير الحجم:"
+            },
+            bn: {
+                select_pdf: "PDF নির্বাচন করুন",
+                select_pdf_description: "সংকুচিত করতে PDF ফাইল নির্বাচন করুন",
+                file_name: "ফাইলের নাম:",
+                file_size: "আকার:",
+                compression_level: "সংকোচনের স্তর",
+                compress: "সংকুচিত করুন",
+                low_quality: "নিম্ন (%40)<br>উচ্চ গুণমান",
+                medium_quality: "মধ্যম (%50)<br>মধ্যম গুণমান",
+                high_quality: "উচ্চ (%70)<br>নিম্ন গুণমান",
+                please_select_pdf: "দয়া করে একটি PDF ফাইল নির্বাচন করুন!",
+                pdf_uploaded_success: "PDF সফলভাবে আপলোড হয়েছে!",
+                converting_to_photos: "📖 PDF ছবিতে রূপান্তর করা হচ্ছে...",
+                converting_pages: "🖼️ {{pages}} পৃষ্ঠা ছবিতে রূপান্তর করা হচ্ছে...",
+                creating_new_pdf: "📄 নতুন PDF তৈরি করা হচ্ছে...",
+                processing_page: "📸 পৃষ্ঠা {{current}}/{{total}} প্রক্রিয়া করা হচ্ছে...",
+                compression_success: "✅ সফলভাবে সংকুচিত! %{{reduction}} হ্রাস পেয়েছে।",
+                already_optimized: "ℹ️ PDF ইতিমধ্যেই অপ্টিমাইজড।",
+                save_file: "💾 সংরক্ষণ করুন",
+                file_saved: "✅ PDF সফলভাবে সংরক্ষিত!",
+                file_downloaded: "✅ PDF সফলভাবে ডাউনলোড হয়েছে!",
+                error_compressing: "❌ ত্রুটি: PDF সংকুচিত করা যায়নি",
+                previous_size: "📦 পূর্ববর্তী আকার:",
+                new_size: "📉 নতুন আকার:",
+                size_change: "💾 আকার পরিবর্তন:"
+            },
+            hi: {
+                select_pdf: "PDF चुनें",
+                select_pdf_description: "संपीड़ित करने के लिए PDF फ़ाइल चुनें",
+                file_name: "फ़ाइल का नाम:",
+                file_size: "आकार:",
+                compression_level: "संपीड़न स्तर",
+                compress: "संपीड़ित करें",
+                low_quality: "कम (%40)<br>उच्च गुणवत्ता",
+                medium_quality: "मध्यम (%50)<br>मध्यम गुणवत्ता",
+                high_quality: "उच्च (%70)<br>कम गुणवत्ता",
+                please_select_pdf: "कृपया एक PDF फ़ाइल चुनें!",
+                pdf_uploaded_success: "PDF सफलतापूर्वक अपलोड हुआ!",
+                converting_to_photos: "📖 PDF को फोटो में बदला जा रहा है...",
+                converting_pages: "🖼️ {{pages}} पृष्ठ फोटो में बदले जा रहे हैं...",
+                creating_new_pdf: "📄 नया PDF बनाया जा रहा है...",
+                processing_page: "📸 पृष्ठ {{current}}/{{total}} प्रसंस्करण किया जा रहा है...",
+                compression_success: "✅ सफलतापूर्वक संपीड़ित! %{{reduction}} कम हुआ।",
+                already_optimized: "ℹ️ PDF पहले से ही अनुकूलित है।",
+                save_file: "💾 सहेजें",
+                file_saved: "✅ PDF सफलतापूर्वक सहेजा गया!",
+                file_downloaded: "✅ PDF सफलतापूर्वक डाउनलोड हुआ!",
+                error_compressing: "❌ त्रुटि: PDF संपीड़ित नहीं किया जा सका",
+                previous_size: "📦 पिछला आकार:",
+                new_size: "📉 नया आकार:",
+                size_change: "💾 आकार परिवर्तन:"
+            },
+            id: {
+                select_pdf: "PILIH PDF",
+                select_pdf_description: "Pilih file PDF untuk dikompresi",
+                file_name: "Nama File:",
+                file_size: "Ukuran:",
+                compression_level: "Tingkat Kompresi",
+                compress: "KOMPRESI",
+                low_quality: "Rendah (%40)<br>Kualitas Tinggi",
+                medium_quality: "Sedang (%50)<br>Kualitas Menengah",
+                high_quality: "Tinggi (%70)<br>Kualitas Rendah",
+                please_select_pdf: "Silakan pilih file PDF!",
+                pdf_uploaded_success: "PDF berhasil diunggah!",
+                converting_to_photos: "📖 Mengonversi PDF ke foto...",
+                converting_pages: "🖼️ Mengonversi {{pages}} halaman ke foto...",
+                creating_new_pdf: "📄 Membuat PDF baru...",
+                processing_page: "📸 Memproses halaman {{current}}/{{total}}...",
+                compression_success: "✅ Berhasil dikompresi! Berkurang %{{reduction}}.",
+                already_optimized: "ℹ️ PDF sudah dioptimalkan.",
+                save_file: "💾 SIMPAN",
+                file_saved: "✅ PDF berhasil disimpan!",
+                file_downloaded: "✅ PDF berhasil diunduh!",
+                error_compressing: "❌ Kesalahan: Tidak dapat mengompresi PDF",
+                previous_size: "📦 Ukuran sebelumnya:",
+                new_size: "📉 Ukuran baru:",
+                size_change: "💾 Perubahan ukuran:"
+            },
+            ja: {
+                select_pdf: "PDFを選択",
+                select_pdf_description: "圧縮するPDFファイルを選択してください",
+                file_name: "ファイル名:",
+                file_size: "サイズ:",
+                compression_level: "圧縮レベル",
+                compress: "圧縮",
+                low_quality: "低 (%40)<br>高品質",
+                medium_quality: "中 (%50)<br>中品質",
+                high_quality: "高 (%70)<br>低品質",
+                please_select_pdf: "PDFファイルを選択してください!",
+                pdf_uploaded_success: "PDFが正常にアップロードされました!",
+                converting_to_photos: "📖 PDFを写真に変換中...",
+                converting_pages: "🖼️ {{pages}}ページを写真に変換中...",
+                creating_new_pdf: "📄 新しいPDFを作成中...",
+                processing_page: "📸 {{current}}/{{total}}ページを処理中...",
+                compression_success: "✅ 正常に圧縮されました! {{reduction}}%削減.",
+                already_optimized: "ℹ️ PDFは既に最適化されています.",
+                save_file: "💾 保存",
+                file_saved: "✅ PDFが正常に保存されました!",
+                file_downloaded: "✅ PDFが正常にダウンロードされました!",
+                error_compressing: "❌ エラー: PDFを圧縮できませんでした",
+                previous_size: "📦 以前のサイズ:",
+                new_size: "📉 新しいサイズ:",
+                size_change: "💾 サイズ変更:"
+            },
+            ku: {
+                select_pdf: "PDF BİJARTIN",
+                select_pdf_description: "Ji bo şidandinê dosyeya PDFê hilbijêrin",
+                file_name: "Navê Dosyeyê:",
+                file_size: "Mezinahî:",
+                compression_level: "Asta Şidandinê",
+                compress: "ŞIDANDIN",
+                low_quality: "Nizm (%40)<br>Kalîteya Bilind",
+                medium_quality: "Navîn (%50)<br>Kalîteya Navîn",
+                high_quality: "Bilind (%70)<br>Kalîteya Nizm",
+                please_select_pdf: "Ji kerema xwe dosyeyeke PDFê hilbijêrin!",
+                pdf_uploaded_success: "PDF bi serkeftî hate barkirin!",
+                converting_to_photos: "📖 PDF tê veguherandin wêneyan...",
+                converting_pages: "🖼️ {{pages}} rûpel têne veguherandin wêneyan...",
+                creating_new_pdf: "📄 PDFya nû tê çêkirin...",
+                processing_page: "📸 Rûpela {{current}}/{{total}} tê pêvajokirin...",
+                compression_success: "✅ Bi serkeftî hate şidandin! %{{reduction}} kêm bû.",
+                already_optimized: "ℹ️ PDF jixwe optimize bûye.",
+                save_file: "💾 TOMAR BİKİ",
+                file_saved: "✅ PDF bi serkeftî hate tomarkirin!",
+                file_downloaded: "✅ PDF bi serkeftî hate daxistin!",
+                error_compressing: "❌ Çewtî: PDF nehat şidandin",
+                previous_size: "📦 Mezinahiya Berê:",
+                new_size: "📉 Mezinahiya Nû:",
+                size_change: "💾 Guhertina Mezinahiyê:"
+            },
+            pt: {
+                select_pdf: "SELECIONAR PDF",
+                select_pdf_description: "Selecione o arquivo PDF para compactar",
+                file_name: "Nome do Arquivo:",
+                file_size: "Tamanho:",
+                compression_level: "Nível de Compactação",
+                compress: "COMPACTAR",
+                low_quality: "Baixo (%40)<br>Alta Qualidade",
+                medium_quality: "Médio (%50)<br>Qualidade Média",
+                high_quality: "Alto (%70)<br>Baixa Qualidade",
+                please_select_pdf: "Por favor selecione um arquivo PDF!",
+                pdf_uploaded_success: "PDF carregado com sucesso!",
+                converting_to_photos: "📖 Convertendo PDF para fotos...",
+                converting_pages: "🖼️ Convertendo {{pages}} páginas para fotos...",
+                creating_new_pdf: "📄 Criando novo PDF...",
+                processing_page: "📸 Processando página {{current}}/{{total}}...",
+                compression_success: "✅ Compactado com sucesso! Reduzido em %{{reduction}}.",
+                already_optimized: "ℹ️ PDF já está otimizado.",
+                save_file: "💾 SALVAR",
+                file_saved: "✅ PDF salvo com sucesso!",
+                file_downloaded: "✅ PDF baixado com sucesso!",
+                error_compressing: "❌ Erro: Não foi possível compactar o PDF",
+                previous_size: "📦 Tamanho anterior:",
+                new_size: "📉 Novo tamanho:",
+                size_change: "💾 Mudança de tamanho:"
+            },
+            ru: {
+                select_pdf: "ВЫБРАТЬ PDF",
+                select_pdf_description: "Выберите PDF файл для сжатия",
+                file_name: "Имя файла:",
+                file_size: "Размер:",
+                compression_level: "Уровень сжатия",
+                compress: "СЖАТЬ",
+                low_quality: "Низкий (%40)<br>Высокое качество",
+                medium_quality: "Средний (%50)<br>Среднее качество",
+                high_quality: "Высокий (%70)<br>Низкое качество",
+                please_select_pdf: "Пожалуйста, выберите PDF файл!",
+                pdf_uploaded_success: "PDF успешно загружен!",
+                converting_to_photos: "📖 Преобразование PDF в фотографии...",
+                converting_pages: "🖼️ Преобразование {{pages}} страниц в фотографии...",
+                creating_new_pdf: "📄 Создание нового PDF...",
+                processing_page: "📸 Обработка страницы {{current}}/{{total}}...",
+                compression_success: "✅ Успешно сжато! Уменьшено на %{{reduction}}.",
+                already_optimized: "ℹ️ PDF уже оптимизирован.",
+                save_file: "💾 СОХРАНИТЬ",
+                file_saved: "✅ PDF успешно сохранен!",
+                file_downloaded: "✅ PDF успешно скачан!",
+                error_compressing: "❌ Ошибка: Не удалось сжать PDF",
+                previous_size: "📦 Предыдущий размер:",
+                new_size: "📉 Новый размер:",
+                size_change: "💾 Изменение размера:"
+            },
+            sw: {
+                select_pdf: "CHAGUA PDF",
+                select_pdf_description: "Chagua faili ya PDF ili kubana",
+                file_name: "Jina Faili:",
+                file_size: "Ukubwa:",
+                compression_level: "Kiwango cha Ubana",
+                compress: "BANA",
+                low_quality: "Chini (%40)<br>Ubora wa Juu",
+                medium_quality: "Wastani (%50)<br>Ubora wa Wastani",
+                high_quality: "Juu (%70)<br>Ubora wa Chini",
+                please_select_pdf: "Tafadhali chagua faili ya PDF!",
+                pdf_uploaded_success: "PDF imepakiwa kikamilifu!",
+                converting_to_photos: "📖 Kubadilisha PDF kuwa picha...",
+                converting_pages: "🖼️ Kubadilisha kurasa {{pages}} kuwa picha...",
+                creating_new_pdf: "📄 Kuunda PDF mpya...",
+                processing_page: "📸 Inachakata ukurasa {{current}}/{{total}}...",
+                compression_success: "✅ Imebanwa kikamilifu! Imepungua kwa %{{reduction}}.",
+                already_optimized: "ℹ️ PDF tayari imeboreshwa.",
+                save_file: "💾 HIFADHI",
+                file_saved: "✅ PDF imehifadhiwa kikamilifu!",
+                file_downloaded: "✅ PDF imepakuliwa kikamilifu!",
+                error_compressing: "❌ Hitilafu: Haikuweza kubana PDF",
+                previous_size: "📦 Ukubwa uliopita:",
+                new_size: "📉 Ukubwa mpya:",
+                size_change: "💾 Mabadiliko ya ukubwa:"
+            },
+            ur: {
+                select_pdf: "PDF منتخب کریں",
+                select_pdf_description: "پی ڈی ایف فائل کو کمپریس کرنے کے لیے منتخب کریں",
+                file_name: "فائل کا نام:",
+                file_size: "سائز:",
+                compression_level: "کمپریشن لیول",
+                compress: "کمپریس کریں",
+                low_quality: "کم (%40)<br>اعلی معیار",
+                medium_quality: "درمیانہ (%50)<br>درمیانہ معیار",
+                high_quality: "زیادہ (%70)<br>کم معیار",
+                please_select_pdf: "براہ کرم ایک PDF فائل منتخب کریں!",
+                pdf_uploaded_success: "PDF کامیابی سے اپ لوڈ ہو گئی!",
+                converting_to_photos: "📖 PDF کو فوٹوز میں تبدیل کیا جا رہا ہے...",
+                converting_pages: "🖼️ {{pages}} صفحات کو فوٹوز میں تبدیل کیا جا رہا ہے...",
+                creating_new_pdf: "📄 نیا PDF بنایا جا رہا ہے...",
+                processing_page: "📸 صفحہ {{current}}/{{total}} پراسیس ہو رہا ہے...",
+                compression_success: "✅ کامیابی سے کمپریس ہو گیا! %{{reduction}} کم ہوا۔",
+                already_optimized: "ℹ️ PDF پہلے ہی آپٹیمائزڈ ہے۔",
+                save_file: "💾 محفوظ کریں",
+                file_saved: "✅ PDF کامیابی سے محفوظ ہو گئی!",
+                file_downloaded: "✅ PDF کامیابی سے ڈاؤن لوڈ ہو گئی!",
+                error_compressing: "❌ خرابی: PDF کو کمپریس نہیں کیا جا سکا",
+                previous_size: "📦 پچھلا سائز:",
+                new_size: "📉 نیا سائز:",
+                size_change: "💾 سائز میں تبدیلی:"
+            },
+            za: {
+                select_pdf: "PDF WEÇIN",
+                select_pdf_description: "Ji bo şidandinê dosyeya PDFê hilbijêre",
+                file_name: "Navê Dosyeyê:",
+                file_size: "Mezinahî:",
+                compression_level: "Asta Şidandinê",
+                compress: "ŞIDANDIN",
+                low_quality: "Nizm (%40)<br>Kalîteya Bilind",
+                medium_quality: "Navîn (%50)<br>Kalîteya Navîn",
+                high_quality: "Bilind (%70)<br>Kalîteya Nizm",
+                please_select_pdf: "Ji kerema xwe dosyeyeke PDFê hilbijêre!",
+                pdf_uploaded_success: "PDF bi serkeftî hate barkirin!",
+                converting_to_photos: "📖 PDF tê veguherandin wêneyan...",
+                converting_pages: "🖼️ {{pages}} rûpel têne veguherandin wêneyan...",
+                creating_new_pdf: "📄 PDFya nû tê çêkirin...",
+                processing_page: "📸 Rûpela {{current}}/{{total}} tê pêvajokirin...",
+                compression_success: "✅ Bi serkeftî hate şidandin! %{{reduction}} kêm bû.",
+                already_optimized: "ℹ️ PDF jixwe optimize bûye.",
+                save_file: "💾 TOMAR BIKE",
+                file_saved: "✅ PDF bi serkeftî hate tomarkirin!",
+                file_downloaded: "✅ PDF bi serkeftî hate daxistin!",
+                error_compressing: "❌ Çewtî: PDF nehat şidandin",
+                previous_size: "📦 Mezinahiya Berê:",
+                new_size: "📉 Mezinahiya Nû:",
+                size_change: "💾 Guhertina Mezinahiyê:"
+            },
+            zh: {
+                select_pdf: "选择PDF",
+                select_pdf_description: "选择要压缩的PDF文件",
+                file_name: "文件名:",
+                file_size: "大小:",
+                compression_level: "压缩级别",
+                compress: "压缩",
+                low_quality: "低 (%40)<br>高质量",
+                medium_quality: "中 (%50)<br>中等质量",
+                high_quality: "高 (%70)<br>低质量",
+                please_select_pdf: "请选择一个PDF文件!",
+                pdf_uploaded_success: "PDF上传成功!",
+                converting_to_photos: "📖 将PDF转换为照片...",
+                converting_pages: "🖼️ 将{{pages}}页转换为照片...",
+                creating_new_pdf: "📄 创建新PDF...",
+                processing_page: "📸 处理第{{current}}/{{total}}页...",
+                compression_success: "✅ 压缩成功! 减少了%{{reduction}}.",
+                already_optimized: "ℹ️ PDF已经优化.",
+                save_file: "💾 保存",
+                file_saved: "✅ PDF保存成功!",
+                file_downloaded: "✅ PDF下载成功!",
+                error_compressing: "❌ 错误: 无法压缩PDF",
+                previous_size: "📦 之前大小:",
+                new_size: "📉 新大小:",
+                size_change: "💾 大小变化:"
+            }
+        };
+
+        // UI metinlerini güncelleme fonksiyonu - DÜZELTİLMİŞ
+        function updateUIText() {
+            const currentLang = languageConfig.getCurrent();
+            const langTranslations = translations[currentLang] || translations.tr;
+            
+            // data-i18n attribute'u olan tüm elementleri bul
+            const elements = document.querySelectorAll('[data-i18n]');
+            
+            elements.forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (langTranslations[key]) {
+                    // BUTON için textContent kullan
+                    if (element.tagName === 'BUTTON') {
+                        element.textContent = langTranslations[key];
+                    } 
+                    // INPUT için value kullan
+                    else if (element.tagName === 'INPUT') {
+                        element.value = langTranslations[key];
+                    }
+                    // Diğer elementler için innerHTML kullan
+                    else {
+                        element.innerHTML = langTranslations[key];
+                    }
+                }
+            });
+            
+            // Kaydırıcı değerini güncelle
+            updateSliderText();
+        }
+
+        // Kaydırıcı metnini güncelle
+        function updateSliderText() {
+            const currentLang = languageConfig.getCurrent();
+            const level = compressionLevels[compressionSlider.value];
+            const langTranslations = translations[currentLang] || translations.tr;
+            
+            let levelText = '';
+            switch(compressionSlider.value) {
+                case '1':
+                    levelText = langTranslations['low_quality'] ? langTranslations['low_quality'].split('<br>')[0] : level.name;
+                    break;
+                case '2':
+                    levelText = langTranslations['medium_quality'] ? langTranslations['medium_quality'].split('<br>')[0] : level.name;
+                    break;
+                case '3':
+                    levelText = langTranslations['high_quality'] ? langTranslations['high_quality'].split('<br>')[0] : level.name;
+                    break;
+            }
+            
+            compressionValue.textContent = levelText;
+        }
+
+        // Çeviri fonksiyonu
+        function t(key, params = {}) {
+            const currentLang = languageConfig.getCurrent();
+            const langTranslations = translations[currentLang] || translations.tr;
+            let text = langTranslations[key] || key;
+            
+            // Parametreleri değiştir
+            for (const [param, value] of Object.entries(params)) {
+                text = text.replace(`{{${param}}}`, value);
+            }
+            
+            return text;
+        }
+
+        pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+        // Elementleri seç
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const compressionSlider = document.getElementById('compressionSlider');
+        const compressionValue = document.getElementById('compressionValue');
+        const compressBtn = document.getElementById('compressBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const result = document.getElementById('result');
+        const sizeCompare = document.getElementById('sizeCompare');
+
+        let selectedFile = null;
+        let compressedBlob = null;
+
+        // Sistem teması değişikliğini dinle
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        function handleThemeChange(e) {
+            console.log('Tema değişti:', e.matches ? 'dark' : 'light');
+        }
+
+        // Tema değişikliğini dinle
+        mediaQuery.addEventListener('change', handleThemeChange);
+
+        // Sıkıştırma seviyeleri
+        const compressionLevels = {
+            1: { quality: 0.6, scale: 0.8, name: "Düşük (%40)", desc: "Yüksek Kalite" },
+            2: { quality: 0.5, scale: 1.0, name: "Orta (%50)", desc: "Orta Kalite" },
+            3: { quality: 0.3, scale: 0.6, name: "Yüksek (%70)", desc: "Düşük Kalite" }
+        };
+
+        // Kaydırıcı değiştiğinde
+        compressionSlider.addEventListener('input', (e) => {
+            updateSliderText();
+        });
+
+        // Yükleme alanı etkileşimleri
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('active');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('active');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // Dosya seçimi
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Dosya işleme
+        function handleFileSelect(file) {
+            if (file.type !== 'application/pdf') {
+                showResult(t('please_select_pdf'), 'error');
+                return;
+            }
+
+            selectedFile = file;
+            
+            // Dosya bilgilerini göster
+            fileName.textContent = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
+            fileSize.textContent = formatBytes(file.size);
+            fileInfo.classList.add('visible');
+            
+            // Butonu aktif et
+            compressBtn.disabled = false;
+            
+            showResult(t('pdf_uploaded_success'), 'success');
+        }
+
+        // Boyut formatlama
+        function formatBytes(bytes) {
+            if (bytes === 0) return "0 B";
+            const k = 1024;
+            const sizes = ["B", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        // İlerleme güncelleme
+        function updateProgress(percent) {
+            progressBar.style.width = percent + '%';
+        }
+
+        // Sonuç gösterme
+        function showResult(message, type) {
+            result.innerHTML = message;
+            result.className = `result visible ${type}`;
+        }
+
+        // PDF Kaydetme Fonksiyonu
+        function savePDF(blob, fileName) {
+            if (window.flutter_inappwebview) {
+                window.flutter_inappwebview.callHandler('saveFile', {
+                    fileName: fileName,
+                    fileData: Array.from(new Uint8Array(blob))
+                }).then(function(result) {
+                    console.log('Dosya Flutter ile kaydedildi:', result);
+                    showResult(t('file_saved'), 'success');
+                }).catch(function(error) {
+                    console.error('Flutter kaydetme hatası:', error);
+                    downloadPDF(blob, fileName);
+                });
+            } else {
+                downloadPDF(blob, fileName);
+            }
+        }
+
+        // Tarayıcı için PDF indirme
+        function downloadPDF(blob, fileName) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showResult(t('file_downloaded'), 'success');
+        }
+
+        // FOTOĞRAF YÖNTEMİ İLE PDF SIKIŞTIRMA
+        async function compressPDFWithPhotoMethod(file, level) {
+            const originalSize = file.size;
+            const compression = compressionLevels[level];
+
+            // Boyut karşılaştırmasını göster
+            sizeCompare.innerHTML = `
+                <div class="size-item">
+                    <span>${t('previous_size')}</span>
+                    <span><b>${formatBytes(originalSize)}</b></span>
+                </div>
+            `;
+            sizeCompare.style.display = 'block';
+            progressContainer.classList.add('visible');
+
+            showResult(t('converting_to_photos'), 'info');
+            updateProgress(10);
+
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                updateProgress(20);
+
+                // PDF'yi yükle
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const totalPages = pdf.numPages;
+                
+                showResult(t('converting_pages', { pages: totalPages }), 'info');
+                updateProgress(30);
+
+                // Yeni PDF oluştur
+                const pdfDoc = await PDFLib.PDFDocument.create();
+                
+                // Her sayfayı fotoğrafa çevir ve sıkıştır
+                for (let i = 1; i <= totalPages; i++) {
+                    const page = await pdf.getPage(i);
+                    
+                    // Seçilen seviyeye göre çözünürlük ayarı
+                    const viewport = page.getViewport({ scale: compression.scale });
+                    
+                    // Gizli canvas oluştur
+                    const canvas = document.createElement("canvas");
+                    const ctx = canvas.getContext("2d");
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    // Sayfayı canvas'a render et
+                    await page.render({ 
+                        canvasContext: ctx, 
+                        viewport: viewport 
+                    }).promise;
+
+                    // Canvas'ı JPEG'e çevir (sıkıştırma burada olacak)
+                    const jpegDataUrl = canvas.toDataURL("image/jpeg", compression.quality);
+                    
+                    // JPEG'i PDF'ye embed et
+                    const jpegBytes = await fetch(jpegDataUrl).then(res => res.arrayBuffer());
+                    const jpegImage = await pdfDoc.embedJpg(jpegBytes);
+                    
+                    // PDF sayfası oluştur
+                    const pdfPage = pdfDoc.addPage([viewport.width, viewport.height]);
+                    pdfPage.drawImage(jpegImage, { 
+                        x: 0, 
+                        y: 0, 
+                        width: viewport.width, 
+                        height: viewport.height 
+                    });
+
+                    // İlerleme güncelle
+                    const progressPercent = 30 + (i / totalPages) * 60;
+                    updateProgress(progressPercent);
+                    showResult(t('processing_page', { current: i, total: totalPages }), 'info');
+                }
+
+                // Sıkıştırılmış PDF'i kaydet
+                showResult(t('creating_new_pdf'), 'info');
+                updateProgress(95);
+
+                const compressedBytes = await pdfDoc.save();
+                const compressedSize = compressedBytes.byteLength;
+
+                // Sonuçları hesapla
+                const reduction = ((originalSize - compressedSize) / originalSize * 100).toFixed(1);
+                
+                // Sonuçları göster
+                const savingsClass = reduction > 0 ? 'savings' : 'negative-savings';
+                
+                sizeCompare.innerHTML += `
+                    <div class="size-item">
+                        <span>${t('new_size')}</span>
+                        <span><b>${formatBytes(compressedSize)}</b></span>
+                    </div>
+                    <div class="size-item ${savingsClass}">
+                        <span>${t('size_change')}</span>
+                        <span><b>${reduction > 0 ? '-' : '+'}%${Math.abs(reduction)}</b></span>
+                    </div>
+                `;
+
+                updateProgress(100);
+
+                // Blob oluştur
+                compressedBlob = new Blob([compressedBytes], { type: "application/pdf" });
+                
+                if (reduction > 0) {
+                    showResult(t('compression_success', { reduction: reduction }), 'success');
+                } else {
+                    showResult(t('already_optimized'), 'success');
+                }
+
+                // Kaydet butonu
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'download-btn';
+                saveBtn.textContent = t('save_file');
+                saveBtn.addEventListener('click', () => {
+                    savePDF(compressedBlob, "compressed_" + file.name);
+                });
+                result.appendChild(saveBtn);
+
+                return compressedBlob;
+
+            } catch (error) {
+                console.error('Sıkıştırma hatası:', error);
+                throw new Error(t('error_compressing'));
+            }
+        }
+
+        // Sıkıştırma butonu
+        compressBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                showResult(t('please_select_pdf'), 'error');
+                return;
+            }
+
+            try {
+                compressBtn.disabled = true;
+                const level = parseInt(compressionSlider.value);
+                await compressPDFWithPhotoMethod(selectedFile, level);
+            } catch (error) {
+                console.error('Sıkıştırma hatası:', error);
+                showResult(error.message, 'error');
+            } finally {
+                compressBtn.disabled = false;
+            }
+        });
+
+        // Sayfa yüklendiğinde UI'ı güncelle
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUIText();
+        });
+
+        // Lang.js'deki dil değişikliklerini dinle
+        if (typeof languageConfig !== 'undefined') {
+            // Lang.js'nin dil değiştirme fonksiyonunu override et
+            const originalSetLanguage = languageConfig.setLanguage;
+            languageConfig.setLanguage = function(langCode) {
+                const result = originalSetLanguage.call(this, langCode);
+                if (result) {
+                    updateUIText();
+                }
+                return result;
+            };
+        }
+    </script>
+</body>
+</html>

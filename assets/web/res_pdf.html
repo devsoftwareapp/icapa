@@ -1,1 +1,1231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="pdf-lib.min.js"></script>
+    <script src="lang.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        :root {
+            --primary-color: #e74c3c;
+            --primary-dark: #c0392b;
+            --success-color: #27ae60;
+            --success-dark: #219a52;
+            --text-color: #2c3e50;
+            --text-light: #7f8c8d;
+            --bg-color: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-tertiary: #e9ecef;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(231, 76, 60, 0.1);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary-color: #e74c3c;
+                --primary-dark: #c0392b;
+                --success-color: #27ae60;
+                --success-dark: #219a52;
+                --text-color: #f0f0f0;
+                --text-light: #b0b0b0;
+                --bg-color: #1a1a1a;
+                --bg-secondary: #2d2d2d;
+                --bg-tertiary: #3a3a3a;
+                --border-color: #444444;
+                --shadow-color: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            min-height: 60vh;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            color: var(--text-color);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 90%;
+            background: var(--bg-color);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px var(--shadow-color);
+            padding: 15px;
+            margin: 10px auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-color);
+            border-radius: 12px;
+            padding: 15px 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(231, 76, 60, 0.05);
+            margin-bottom: 12px;
+            flex-shrink: 0;
+        }
+
+        .upload-area:hover {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: var(--primary-dark);
+        }
+
+        .upload-icon {
+            width: 50px;
+            height: 50px;
+            margin: 0 auto 10px auto;
+            color: var(--primary-color);
+        }
+
+        .upload-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-text {
+            color: var(--primary-color);
+            font-size: 15px;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+
+        .upload-subtext {
+            color: var(--text-light);
+            font-size: 11px;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .file-info {
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 12px;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .file-info.visible {
+            display: block;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 12px;
+        }
+
+        .info-label {
+            color: var(--text-light);
+            font-weight: 500;
+        }
+
+        .info-value {
+            color: var(--text-color);
+            font-weight: bold;
+        }
+
+        .page-size-container {
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+
+        .size-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .size-label {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+
+        .size-value {
+            font-size: 13px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .page-size-select {
+            width: 90%;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            color: var(--text-color);
+            font-size: 13px;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .size-marks {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 10px;
+            color: var(--text-light);
+        }
+
+        .mark {
+            text-align: center;
+            flex: 1;
+        }
+
+        .progress-container {
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            height: 6px;
+            margin: 12px 0;
+            overflow: hidden;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .progress-container.visible {
+            display: block;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .convert-btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: bold;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .convert-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .convert-btn:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result {
+            text-align: center;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            display: none;
+            flex-shrink: 0;
+        }
+
+        .result.visible {
+            display: block;
+        }
+
+        .result.success {
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+        }
+
+        .result.error {
+            background: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .download-btn {
+            background: var(--success-color);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .download-btn:hover {
+            background: var(--success-dark);
+            transform: translateY(-1px);
+        }
+
+        .image-preview {
+            max-width: 90%;
+            max-height: 100px;
+            border-radius: 8px;
+            margin: 8px auto;
+            display: none;
+            border: 2px solid var(--border-color);
+        }
+
+        .image-preview.visible {
+            display: block;
+        }
+
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 0;
+            gap: 10px;
+        }
+
+        .bottom-space {
+            height: 10px;
+            flex-shrink: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 12px;
+                margin: 5px auto;
+            }
+            
+            .upload-area {
+                padding: 12px 8px;
+            }
+            
+            .upload-icon {
+                width: 45px;
+                height: 45px;
+                margin-bottom: 8px;
+            }
+            
+            .convert-btn {
+                padding: 10px;
+                font-size: 14px;
+                margin-bottom: 12px;
+            }
+            
+            .bottom-space {
+                height: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="content-area">
+            <!-- ÜST KISIM: Resim Alanı ve Bilgiler -->
+            <div>
+                <!-- Resim Yükleme Alanı -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M19,13a1,1,0,0,0-1,1v.38L16.52,12.9a2.79,2.79,0,0,0-3.93,0l-.7.7L9.41,11.12a2.85,2.85,0,0,0-3.93,0L4,12.6V7A1,1,0,0,1,5,6h7a1,1,0,0,0,0-2H5A3,3,0,0,0,2,7V19a3,3,0,0,0,3,3H17a3,3,0,0,0,3-3V14A1,1,0,0,0,19,13ZM5,20a1,1,0,0,1-1-1V15.43l2.9-2.9a.79.79,0,0,1,1.09,0l3.17,3.17,0,0L15.46,20Zm13-1a1,1,0,0,1-1,1H7.63l4.94-4.94a.78.78,0,0,1,1.07,0L18,17.21ZM22.71,4.29l-3-3a1,1,0,0,0-.33-.21,1,1,0,0,0-.76,0,1,1,0,0,0-.33.21l-3,3a1,1,0,0,0,1.42,1.42L18,4.41V10a1,1,0,0,0,2,0V4.41l1.29,1.3a1,1,0,0,0,1.42,0A1,1,0,0,0,22.71,4.29Z"/>
+                        </svg>
+                    </div>
+                    <div class="upload-text" data-key="selectImage">RESMİ SEÇİN</div>
+                    <div class="upload-subtext" data-key="selectImageSubtext">PDF'ye dönüştürmek için resim dosyasını seçin</div>
+                    <input type="file" id="fileInput" accept="image/*">
+                </div>
+
+                <!-- Resim Önizleme -->
+                <img id="imagePreview" class="image-preview" alt="Resim önizleme">
+
+                <!-- Dosya Bilgileri -->
+                <div class="file-info" id="fileInfo">
+                    <div class="info-row">
+                        <span class="info-label" data-key="fileName">Dosya Adı:</span>
+                        <span class="info-value" id="fileName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" data-key="fileSize">Boyut:</span>
+                        <span class="info-value" id="fileSize">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label" data-key="fileType">Tür:</span>
+                        <span class="info-value" id="fileType">-</span>
+                    </div>
+                </div>
+
+                <!-- Sonuç -->
+                <div class="result" id="result"></div>
+            </div>
+
+            <!-- ALT KISIM: Sayfa Boyutu ve Buton -->
+            <div>
+                <!-- Sayfa Boyutu Seçimi -->
+                <div class="page-size-container">
+                    <div class="size-header">
+                        <span class="size-label" data-key="pageSize">Sayfa Boyutu</span>
+                        <span class="size-value" id="sizeValue">A4</span>
+                    </div>
+                    <select class="page-size-select" id="pageSizeSelect">
+                        <option value="a4" data-key="a4">A4 (210×297mm)</option>
+                        <option value="letter" data-key="letter">Letter (216×279mm)</option>
+                        <option value="legal" data-key="legal">Legal (216×356mm)</option>
+                        <option value="a3" data-key="a3">A3 (297×420mm)</option>
+                        <option value="a5" data-key="a5">A5 (148×210mm)</option>
+                        <option value="fit" data-key="fitImage">Resme Sığdır</option>
+                    </select>
+                </div>
+
+                <!-- İlerleme Çubuğu -->
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+
+                <!-- Dönüştür Butonu -->
+                <button class="convert-btn" id="convertBtn" disabled data-key="convertToPdf">PDF'E DÖNÜŞTÜR</button>
+                
+                <!-- Alt Boşluk -->
+                <div class="bottom-space"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Dil çevirileri
+        const translations = {
+            tr: {
+                selectImage: "RESMİ SEÇİN",
+                selectImageSubtext: "PDF'ye dönüştürmek için resim dosyasını seçin",
+                fileName: "Dosya Adı:",
+                fileSize: "Boyut:",
+                fileType: "Tür:",
+                pageSize: "Sayfa Boyutu",
+                convertToPdf: "PDF'E DÖNÜŞTÜR",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Resme Sığdır",
+                imageUploaded: "Resim başarıyla yüklendi!",
+                selectImageError: "Lütfen bir resim dosyası seçin!",
+                creatingPdf: "📄 PDF oluşturuluyor...",
+                pdfCreated: "✅ PDF başarıyla oluşturuldu!",
+                pdfSaved: "✅ Dosyanız Download/PDF Reader <br> Konumuna Kaydedildi!",
+                savePdf: "💾 PDF'İ KAYDET",
+                error: "❌ Hata: ",
+                conversionError: "Resim PDF'e dönüştürülemedi: "
+            },
+            en: {
+                selectImage: "SELECT IMAGE",
+                selectImageSubtext: "Select an image file to convert to PDF",
+                fileName: "File Name:",
+                fileSize: "Size:",
+                fileType: "Type:",
+                pageSize: "Page Size",
+                convertToPdf: "CONVERT TO PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Fit to Image",
+                imageUploaded: "Image uploaded successfully!",
+                selectImageError: "Please select an image file!",
+                creatingPdf: "📄 Creating PDF...",
+                pdfCreated: "✅ PDF created successfully!",
+                pdfSaved: "✅ Your file has been saved to Download/PDF Reader <br> location!",
+                savePdf: "💾 SAVE PDF",
+                error: "❌ Error: ",
+                conversionError: "Image could not be converted to PDF: "
+            },
+            ar: {
+                selectImage: "اختر الصورة",
+                selectImageSubtext: "اختر ملف صورة لتحويله إلى PDF",
+                fileName: "اسم الملف:",
+                fileSize: "الحجم:",
+                fileType: "النوع:",
+                pageSize: "حجم الصفحة",
+                convertToPdf: "تحويل إلى PDF",
+                a4: "A4 (210×297مم)",
+                letter: "Letter (216×279مم)",
+                legal: "Legal (216×356مم)",
+                a3: "A3 (297×420مم)",
+                a5: "A5 (148×210مم)",
+                fitImage: "ملاءمة للصورة",
+                imageUploaded: "تم تحميل الصورة بنجاح!",
+                selectImageError: "يرجى اختيار ملف صورة!",
+                creatingPdf: "📄 جاري إنشاء PDF...",
+                pdfCreated: "✅ تم إنشاء PDF بنجاح!",
+                pdfSaved: "✅ تم حفظ ملفك في مجلد التنزيل/قارئ PDF <br> !",
+                savePdf: "💾 حفظ PDF",
+                error: "❌ خطأ: ",
+                conversionError: "تعذر تحويل الصورة إلى PDF: "
+            },
+            bn: {
+                selectImage: "ছবি নির্বাচন করুন",
+                selectImageSubtext: "PDF-এ রূপান্তর করতে একটি ছবি ফাইল নির্বাচন করুন",
+                fileName: "ফাইলের নাম:",
+                fileSize: "আকার:",
+                fileType: "প্রকার:",
+                pageSize: "পৃষ্ঠার আকার",
+                convertToPdf: "PDF-এ রূপান্তর করুন",
+                a4: "A4 (210×297মিমি)",
+                letter: "Letter (216×279মিমি)",
+                legal: "Legal (216×356মিমি)",
+                a3: "A3 (297×420মিমি)",
+                a5: "A5 (148×210মিমি)",
+                fitImage: "ছবির সাথে ফিট করুন",
+                imageUploaded: "ছবি সফলভাবে আপলোড হয়েছে!",
+                selectImageError: "দয়া করে একটি ছবি ফাইল নির্বাচন করুন!",
+                creatingPdf: "📄 PDF তৈরি করা হচ্ছে...",
+                pdfCreated: "✅ PDF সফলভাবে তৈরি হয়েছে!",
+                pdfSaved: "✅ আপনার ফাইল ডাউনলোড/PDF রিডার <br> অবস্থানে সংরক্ষিত হয়েছে!",
+                savePdf: "💾 PDF সংরক্ষণ করুন",
+                error: "❌ ত্রুটি: ",
+                conversionError: "ছবিটি PDF-এ রূপান্তর করা যায়নি: "
+            },
+            de: {
+                selectImage: "BILD AUSWÄHLEN",
+                selectImageSubtext: "Wählen Sie eine Bilddatei zur Konvertierung in PDF",
+                fileName: "Dateiname:",
+                fileSize: "Größe:",
+                fileType: "Typ:",
+                pageSize: "Seitengröße",
+                convertToPdf: "ZU PDF KONVERTIEREN",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "An Bild anpassen",
+                imageUploaded: "Bild erfolgreich hochgeladen!",
+                selectImageError: "Bitte wählen Sie eine Bilddatei!",
+                creatingPdf: "📄 PDF wird erstellt...",
+                pdfCreated: "✅ PDF erfolgreich erstellt!",
+                pdfSaved: "✅ Ihre Datei wurde im Download/PDF Reader <br> Speicherort gespeichert!",
+                savePdf: "💾 PDF SPEICHERN",
+                error: "❌ Fehler: ",
+                conversionError: "Bild konnte nicht in PDF konvertiert werden: "
+            },
+            es: {
+                selectImage: "SELECCIONAR IMAGEN",
+                selectImageSubtext: "Seleccione un archivo de imagen para convertir a PDF",
+                fileName: "Nombre del archivo:",
+                fileSize: "Tamaño:",
+                fileType: "Tipo:",
+                pageSize: "Tamaño de página",
+                convertToPdf: "CONVERTIR A PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Ajustar a imagen",
+                imageUploaded: "¡Imagen cargada exitosamente!",
+                selectImageError: "¡Por favor seleccione un archivo de imagen!",
+                creatingPdf: "📄 Creando PDF...",
+                pdfCreated: "✅ ¡PDF creado exitosamente!",
+                pdfSaved: "✅ Su archivo ha sido guardado en la ubicación <br> de Descargas/PDF Reader!",
+                savePdf: "💾 GUARDAR PDF",
+                error: "❌ Error: ",
+                conversionError: "No se pudo convertir la imagen a PDF: "
+            },
+            fr: {
+                selectImage: "SÉLECTIONNER L'IMAGE",
+                selectImageSubtext: "Sélectionnez un fichier image à convertir en PDF",
+                fileName: "Nom du fichier:",
+                fileSize: "Taille:",
+                fileType: "Type:",
+                pageSize: "Taille de page",
+                convertToPdf: "CONVERTIR EN PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Ajuster à l'image",
+                imageUploaded: "Image téléchargée avec succès!",
+                selectImageError: "Veuillez sélectionner un fichier image!",
+                creatingPdf: "📄 Création du PDF...",
+                pdfCreated: "✅ PDF créé avec succès!",
+                pdfSaved: "✅ Votre fichier a été enregistré dans l'emplacement <br> Téléchargements/PDF Reader!",
+                savePdf: "💾 ENREGISTRER PDF",
+                error: "❌ Erreur: ",
+                conversionError: "L'image n'a pas pu être convertie en PDF: "
+            },
+            hi: {
+                selectImage: "छवि चुनें",
+                selectImageSubtext: "PDF में बदलने के लिए एक छवि फ़ाइल चुनें",
+                fileName: "फ़ाइल नाम:",
+                fileSize: "आकार:",
+                fileType: "प्रकार:",
+                pageSize: "पृष्ठ आकार",
+                convertToPdf: "PDF में बदलें",
+                a4: "A4 (210×297मिमी)",
+                letter: "Letter (216×279मिमी)",
+                legal: "Legal (216×356मिमी)",
+                a3: "A3 (297×420मिमी)",
+                a5: "A5 (148×210मिमी)",
+                fitImage: "छवि में फ़िट करें",
+                imageUploaded: "छवि सफलतापूर्वक अपलोड की गई!",
+                selectImageError: "कृपया एक छवि फ़ाइल चुनें!",
+                creatingPdf: "📄 PDF बनाया जा रहा है...",
+                pdfCreated: "✅ PDF सफलतापूर्वक बनाया गया!",
+                pdfSaved: "✅ आपकी फ़ाइल डाउनलोड/PDF रीडर <br> स्थान पर सहेजी गई है!",
+                savePdf: "💾 PDF सहेजें",
+                error: "❌ त्रुटि: ",
+                conversionError: "छवि को PDF में नहीं बदला जा सका: "
+            },
+            id: {
+                selectImage: "PILIH GAMBAR",
+                selectImageSubtext: "Pilih file gambar untuk dikonversi ke PDF",
+                fileName: "Nama File:",
+                fileSize: "Ukuran:",
+                fileType: "Jenis:",
+                pageSize: "Ukuran Halaman",
+                convertToPdf: "KONVERSI KE PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Sesuaikan dengan Gambar",
+                imageUploaded: "Gambar berhasil diunggah!",
+                selectImageError: "Silakan pilih file gambar!",
+                creatingPdf: "📄 Membuat PDF...",
+                pdfCreated: "✅ PDF berhasil dibuat!",
+                pdfSaved: "✅ File Anda telah disimpan di lokasi <br> Download/PDF Reader!",
+                savePdf: "💾 SIMPAN PDF",
+                error: "❌ Kesalahan: ",
+                conversionError: "Gambar tidak dapat dikonversi ke PDF: "
+            },
+            ja: {
+                selectImage: "画像を選択",
+                selectImageSubtext: "PDFに変換する画像ファイルを選択してください",
+                fileName: "ファイル名:",
+                fileSize: "サイズ:",
+                fileType: "種類:",
+                pageSize: "ページサイズ",
+                convertToPdf: "PDFに変換",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "画像に合わせる",
+                imageUploaded: "画像が正常にアップロードされました！",
+                selectImageError: "画像ファイルを選択してください！",
+                creatingPdf: "📄 PDFを作成中...",
+                pdfCreated: "✅ PDFが正常に作成されました！",
+                pdfSaved: "✅ ファイルはダウンロード/PDFリーダーの <br> 場所に保存されました！",
+                savePdf: "💾 PDFを保存",
+                error: "❌ エラー: ",
+                conversionError: "画像をPDFに変換できませんでした: "
+            },
+            ku: {
+                selectImage: "WÊNEYÊ BİJÊRE",
+                selectImageSubtext: "Ji bo veguherîna PDFê pelê wêneyê hilbijêre",
+                fileName: "Navê Pelê:",
+                fileSize: "Mezinahî:",
+                fileType: "Cure:",
+                pageSize: "Mezinahiya Rûpelê",
+                convertToPdf: "BIGUHERÎNE PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Li Wêneyê Bicîh Bibe",
+                imageUploaded: "Wêne bi serketî hate barkirin!",
+                selectImageError: "Ji kerema xwe pelê wêneyê hilbijêre!",
+                creatingPdf: "📄 PDF tê çêkirin...",
+                pdfCreated: "✅ PDF bi serketî hate çêkirin!",
+                pdfSaved: "✅ Pelê we li cihê Daxistin/PDF Reader <br> hate tomarkirin!",
+                savePdf: "💾 PDF BİPARÊZE",
+                error: "❌ Çewtî: ",
+                conversionError: "Wêne nikaribû were veguherandin PDF: "
+            },
+            pt: {
+                selectImage: "SELECIONAR IMAGEM",
+                selectImageSubtext: "Selecione um arquivo de imagem para converter para PDF",
+                fileName: "Nome do Arquivo:",
+                fileSize: "Tamanho:",
+                fileType: "Tipo:",
+                pageSize: "Tamanho da Página",
+                convertToPdf: "CONVERTER PARA PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Ajustar à Imagem",
+                imageUploaded: "Imagem carregada com sucesso!",
+                selectImageError: "Por favor, selecione um arquivo de imagem!",
+                creatingPdf: "📄 Criando PDF...",
+                pdfCreated: "✅ PDF criado com sucesso!",
+                pdfSaved: "✅ Seu arquivo foi salvo no local <br> Download/PDF Reader!",
+                savePdf: "💾 SALVAR PDF",
+                error: "❌ Erro: ",
+                conversionError: "A imagem não pôde ser convertida para PDF: "
+            },
+            ru: {
+                selectImage: "ВЫБРАТЬ ИЗОБРАЖЕНИЕ",
+                selectImageSubtext: "Выберите файл изображения для преобразования в PDF",
+                fileName: "Имя файла:",
+                fileSize: "Размер:",
+                fileType: "Тип:",
+                pageSize: "Размер страницы",
+                convertToPdf: "КОНВЕРТИРОВАТЬ В PDF",
+                a4: "A4 (210×297мм)",
+                letter: "Letter (216×279мм)",
+                legal: "Legal (216×356мм)",
+                a3: "A3 (297×420мм)",
+                a5: "A5 (148×210мм)",
+                fitImage: "Подогнать под изображение",
+                imageUploaded: "Изображение успешно загружено!",
+                selectImageError: "Пожалуйста, выберите файл изображения!",
+                creatingPdf: "📄 Создание PDF...",
+                pdfCreated: "✅ PDF успешно создан!",
+                pdfSaved: "✅ Ваш файл сохранен в папке <br> Загрузки/PDF Reader!",
+                savePdf: "💾 СОХРАНИТЬ PDF",
+                error: "❌ Ошибка: ",
+                conversionError: "Не удалось преобразовать изображение в PDF: "
+            },
+            sw: {
+                selectImage: "CHAGUA PICHA",
+                selectImageSubtext: "Chagua faili la picha kubadilisha ku PDF",
+                fileName: "Jina la Faili:",
+                fileSize: "Ukubwa:",
+                fileType: "Aina:",
+                pageSize: "Ukubwa wa Ukurasa",
+                convertToPdf: "BADILISHA KWENDA PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Linganisha na Picha",
+                imageUploaded: "Picha imepakiwa kikamilifu!",
+                selectImageError: "Tafadhali chagua faili la picha!",
+                creatingPdf: "📄 Inatengeneza PDF...",
+                pdfCreated: "✅ PDF imetengenezwa kikamilifu!",
+                pdfSaved: "✅ Faili yako imehifadhiwa kwenye eneo la <br> Upakuaji/PDF Reader!",
+                savePdf: "💾 HIFADHI PDF",
+                error: "❌ Kosa: ",
+                conversionError: "Haikuweza kubadilisha picha ku PDF: "
+            },
+            ur: {
+                selectImage: "تصویر منتخب کریں",
+                selectImageSubtext: "PDF میں تبدیل کرنے کے لیے ایک تصویری فائل منتخب کریں",
+                fileName: "فائل کا نام:",
+                fileSize: "سائز:",
+                fileType: "قسم:",
+                pageSize: "صفحے کا سائز",
+                convertToPdf: "PDF میں تبدیل کریں",
+                a4: "A4 (210×297ملی میٹر)",
+                letter: "Letter (216×279ملی میٹر)",
+                legal: "Legal (216×356ملی میٹر)",
+                a3: "A3 (297×420ملی میٹر)",
+                a5: "A5 (148×210ملی میٹر)",
+                fitImage: "تصویر کے مطابق فٹ کریں",
+                imageUploaded: "تصویر کامیابی سے اپ لوڈ ہو گئی!",
+                selectImageError: "براہ کرم ایک تصویری فائل منتخب کریں!",
+                creatingPdf: "📄 PDF بنا رہا ہے...",
+                pdfCreated: "✅ PDF کامیابی سے بن گیا!",
+                pdfSaved: "✅ آپ کی فائل ڈاؤن لوڈ/PDF ریڈر <br> مقام پر محفوظ ہو گئی ہے!",
+                savePdf: "💾 PDF محفوظ کریں",
+                error: "❌ خرابی: ",
+                conversionError: "تصویر کو PDF میں تبدیل نہیں کیا جا سکا: "
+            },
+            za: {
+                selectImage: "RESM BİVÊJİN",
+                selectImageSubtext: "Ji bo veguherîna PDFê pelê resmê hilbijêre",
+                fileName: "Navê Pelê:",
+                fileSize: "Mezinahî:",
+                fileType: "Cure:",
+                pageSize: "Mezinahiya Rûpelê",
+                convertToPdf: "BIGUHERÎNE PDF",
+                a4: "A4 (210×297mm)",
+                letter: "Letter (216×279mm)",
+                legal: "Legal (216×356mm)",
+                a3: "A3 (297×420mm)",
+                a5: "A5 (148×210mm)",
+                fitImage: "Li Resmê Bicîh Bibe",
+                imageUploaded: "Resm bi serketî hate barkirin!",
+                selectImageError: "Ji kerema xwe pelê resmê hilbijêre!",
+                creatingPdf: "📄 PDF tê çêkirin...",
+                pdfCreated: "✅ PDF bi serketî hate çêkirin!",
+                pdfSaved: "✅ Pelê we li cihê Daxistin/PDF Reader <br> hate tomarkirin!",
+                savePdf: "💾 PDF BİPARÊZE",
+                error: "❌ Çewtî: ",
+                conversionError: "Resm nikaribû were veguherandin PDF: "
+            },
+            zh: {
+                selectImage: "选择图片",
+                selectImageSubtext: "选择要转换为PDF的图片文件",
+                fileName: "文件名:",
+                fileSize: "大小:",
+                fileType: "类型:",
+                pageSize: "页面大小",
+                convertToPdf: "转换为PDF",
+                a4: "A4 (210×297毫米)",
+                letter: "Letter (216×279毫米)",
+                legal: "Legal (216×356毫米)",
+                a3: "A3 (297×420毫米)",
+                a5: "A5 (148×210毫米)",
+                fitImage: "适应图片",
+                imageUploaded: "图片上传成功！",
+                selectImageError: "请选择一个图片文件！",
+                creatingPdf: "📄 正在创建PDF...",
+                pdfCreated: "✅ PDF创建成功！",
+                pdfSaved: "✅ 您的文件已保存到下载/PDF阅读器 <br> 位置！",
+                savePdf: "💾 保存PDF",
+                error: "❌ 错误: ",
+                conversionError: "无法将图片转换为PDF: "
+            }
+        };
+
+        // Elementleri seç
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const fileType = document.getElementById('fileType');
+        const pageSizeSelect = document.getElementById('pageSizeSelect');
+        const sizeValue = document.getElementById('sizeValue');
+        const convertBtn = document.getElementById('convertBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressBar = document.getElementById('progressBar');
+        const result = document.getElementById('result');
+
+        let selectedFile = null;
+        let convertedBlob = null;
+        let currentLanguage = 'tr'; // Varsayılan dil
+
+        // Sayfa boyutları
+        const pageSizes = {
+            a4: { width: 595.28, height: 841.89, name: "A4" },
+            letter: { width: 612, height: 792, name: "Letter" },
+            legal: { width: 612, height: 1008, name: "Legal" },
+            a3: { width: 841.89, height: 1190.55, name: "A3" },
+            a5: { width: 420.94, height: 595.28, name: "A5" },
+            fit: { width: 0, height: 0, name: "Resme Sığdır" }
+        };
+
+        // Lang.js'den dil değişikliğini dinle
+        function setupLanguageListener() {
+            // Lang.js mevcut mu kontrol et
+            if (typeof languageConfig !== 'undefined') {
+                console.log('Lang.js yüklendi, mevcut dil:', languageConfig.getCurrent());
+                
+                // Lang.js'nin setLanguage fonksiyonunu override et
+                const originalSetLanguage = languageConfig.setLanguage;
+                languageConfig.setLanguage = function(langCode) {
+                    const result = originalSetLanguage.call(this, langCode);
+                    if (result) {
+                        updateLanguage();
+                    }
+                    return result;
+                };
+                
+                // Lang.js'de updateUIText fonksiyonu varsa, onu da override et
+                if (typeof updateUIText !== 'undefined') {
+                    window.updateUIText = function() {
+                        updateLanguage();
+                    };
+                }
+            } else {
+                console.warn('Lang.js bulunamadı, varsayılan dil kullanılacak');
+            }
+        }
+
+        // Dil güncelleme fonksiyonu
+        function updateLanguage() {
+            // Lang.js'den mevcut dili al
+            if (typeof languageConfig !== 'undefined' && languageConfig.getCurrent) {
+                currentLanguage = languageConfig.getCurrent();
+                console.log('Dil güncellendi:', currentLanguage);
+            } else {
+                console.log('Lang.js bulunamadı, varsayılan dil kullanılıyor:', currentLanguage);
+            }
+            
+            // Tüm çeviri elementlerini güncelle
+            const elements = document.querySelectorAll('[data-key]');
+            elements.forEach(element => {
+                const key = element.getAttribute('data-key');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    element.textContent = translations[currentLanguage][key];
+                } else if (translations['tr'] && translations['tr'][key]) {
+                    // Fallback: Türkçe
+                    element.textContent = translations['tr'][key];
+                }
+            });
+            
+            // Sayfa boyutu seçeneklerini güncelle
+            const options = pageSizeSelect.querySelectorAll('option');
+            options.forEach(option => {
+                const key = option.getAttribute('data-key');
+                if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                    option.textContent = translations[currentLanguage][key];
+                } else if (translations['tr'] && translations['tr'][key]) {
+                    // Fallback: Türkçe
+                    option.textContent = translations['tr'][key];
+                }
+            });
+            
+            // Mevcut seçili sayfa boyutunu güncelle
+            const selectedOption = pageSizeSelect.options[pageSizeSelect.selectedIndex];
+            if (selectedOption) {
+                const sizeKey = selectedOption.value;
+                if (pageSizes[sizeKey]) {
+                    // Sayfa boyutu isimlerini de çevirelim
+                    const sizeNames = {
+                        tr: { a4: "A4", letter: "Letter", legal: "Legal", a3: "A3", a5: "A5", fit: "Resme Sığdır" },
+                        en: { a4: "A4", letter: "Letter", legal: "Legal", a3: "A3", a5: "A5", fit: "Fit to Image" },
+                        ar: { a4: "A4", letter: "Letter", legal: "Legal", a3: "A3", a5: "A5", fit: "ملاءمة للصورة" },
+                        // Diğer diller için de ekleyebilirsiniz
+                    };
+                    
+                    if (sizeNames[currentLanguage] && sizeNames[currentLanguage][sizeKey]) {
+                        sizeValue.textContent = sizeNames[currentLanguage][sizeKey];
+                    } else {
+                        sizeValue.textContent = pageSizes[sizeKey].name;
+                    }
+                }
+            }
+        }
+
+        // Sistem teması değişikliğini dinle
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        
+        function handleThemeChange(e) {
+            console.log('Tema değişti:', e.matches ? 'dark' : 'light');
+        }
+
+        // Tema değişikliğini dinle
+        mediaQuery.addEventListener('change', handleThemeChange);
+
+        // Sayfa boyutu değiştiğinde
+        pageSizeSelect.addEventListener('change', (e) => {
+            const size = pageSizes[e.target.value];
+            // Sayfa boyutu isimlerini çevirelim
+            const sizeNames = {
+                tr: { a4: "A4", letter: "Letter", legal: "Legal", a3: "A3", a5: "A5", fit: "Resme Sığdır" },
+                en: { a4: "A4", letter: "Letter", legal: "Legal", a3: "A3", a5: "A5", fit: "Fit to Image" },
+                ar: { a4: "A4", letter: "Letter", legal: "Legal", a3: "A3", a5: "A5", fit: "ملاءمة للصورة" },
+                // Diğer diller için de ekleyebilirsiniz
+            };
+            
+            if (sizeNames[currentLanguage] && sizeNames[currentLanguage][e.target.value]) {
+                sizeValue.textContent = sizeNames[currentLanguage][e.target.value];
+            } else {
+                sizeValue.textContent = size.name;
+            }
+        });
+
+        // Yükleme alanı etkileşimleri
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('active');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('active');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('active');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFileSelect(files[0]);
+            }
+        });
+
+        // Dosya seçimi
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFileSelect(e.target.files[0]);
+            }
+        });
+
+        // Dosya işleme
+        function handleFileSelect(file) {
+            if (!file.type.startsWith('image/')) {
+                showResult(getTranslation('selectImageError'), 'error');
+                return;
+            }
+
+            selectedFile = file;
+            
+            // Dosya bilgilerini göster
+            fileName.textContent = file.name.length > 20 ? file.name.substring(0, 20) + '...' : file.name;
+            fileSize.textContent = formatBytes(file.size);
+            fileType.textContent = file.type.split('/')[1].toUpperCase();
+            fileInfo.classList.add('visible');
+            
+            // Resim önizleme
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                imagePreview.classList.add('visible');
+            };
+            reader.readAsDataURL(file);
+            
+            // Butonu aktif et
+            convertBtn.disabled = false;
+            
+            showResult(getTranslation('imageUploaded'), 'success');
+        }
+
+        // Çeviri alma fonksiyonu
+        function getTranslation(key) {
+            if (translations[currentLanguage] && translations[currentLanguage][key]) {
+                return translations[currentLanguage][key];
+            } else if (translations['tr'] && translations['tr'][key]) {
+                return translations['tr'][key];
+            }
+            return key;
+        }
+
+        // Boyut formatlama
+        function formatBytes(bytes) {
+            if (bytes === 0) return "0 B";
+            const k = 1024;
+            const sizes = ["B", "KB", "MB", "GB"];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+        }
+
+        // İlerleme güncelleme
+        function updateProgress(percent) {
+            progressBar.style.width = percent + '%';
+        }
+
+        // Sonuç gösterme
+        function showResult(message, type) {
+            result.innerHTML = message;
+            result.className = `result visible ${type}`;
+        }
+
+        // PDF Kaydetme Fonksiyonu - GÜNCELLENDİ
+        function savePDF(blob, fileName) {
+            // Flutter ortamında mı kontrol et
+            if (window.flutter_inappwebview) {
+                // Flutter için dosya kaydetme
+                window.flutter_inappwebview.callHandler('saveFile', {
+                    fileName: fileName,
+                    fileData: Array.from(new Uint8Array(blob))
+                }).then(function(result) {
+                    console.log('Dosya Flutter ile kaydedildi:', result);
+                    showResult(getTranslation('pdfSaved'), 'success');
+                }).catch(function(error) {
+                    console.error('Flutter kaydetme hatası:', error);
+                    // Fallback: normal indirme
+                    downloadPDF(blob, fileName);
+                });
+            } else {
+                // Tarayıcı için normal indirme
+                downloadPDF(blob, fileName);
+            }
+        }
+
+        // Tarayıcı için PDF indirme - GÜNCELLENDİ
+        function downloadPDF(blob, fileName) {
+            // Sadece indirme linki oluştur, yeni sekmede açma
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            showResult(getTranslation('pdfSaved'), 'success');
+        }
+
+        // Resmi PDF'ye dönüştürme
+        async function convertImageToPDF(file, pageSizeKey) {
+            const selectedSize = pageSizes[pageSizeKey];
+            
+            showResult(getTranslation('creatingPdf'), 'info');
+            updateProgress(10);
+            progressContainer.classList.add('visible');
+
+            try {
+                // Resmi yükle
+                const arrayBuffer = await file.arrayBuffer();
+                updateProgress(30);
+
+                // Yeni PDF oluştur
+                const pdfDoc = await PDFLib.PDFDocument.create();
+                updateProgress(50);
+
+                // Resmi PDF'ye embed et
+                let image;
+                const fileType = file.type.toLowerCase();
+                
+                if (fileType.includes('jpeg') || fileType.includes('jpg')) {
+                    image = await pdfDoc.embedJpg(arrayBuffer);
+                } else if (fileType.includes('png')) {
+                    image = await pdfDoc.embedPng(arrayBuffer);
+                } else {
+                    // Diğer formatlar için JPEG'e çevir
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    const img = new Image();
+                    
+                    await new Promise((resolve) => {
+                        img.onload = resolve;
+                        img.src = URL.createObjectURL(file);
+                    });
+                    
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0);
+                    
+                    const jpegDataUrl = canvas.toDataURL('image/jpeg', 0.9);
+                    const jpegBytes = await fetch(jpegDataUrl).then(res => res.arrayBuffer());
+                    image = await pdfDoc.embedJpg(jpegBytes);
+                }
+
+                updateProgress(70);
+
+                // Sayfa boyutunu belirle
+                let pageWidth, pageHeight;
+                
+                if (pageSizeKey === 'fit') {
+                    // Resme sığdır
+                    const aspectRatio = image.width / image.height;
+                    const maxWidth = 595.28; // A4 genişlik
+                    const maxHeight = 841.89; // A4 yükseklik
+                    
+                    if (aspectRatio > 1) {
+                        // Yatay resim
+                        pageWidth = maxWidth;
+                        pageHeight = maxWidth / aspectRatio;
+                    } else {
+                        // Dikey resim
+                        pageHeight = maxHeight;
+                        pageWidth = maxHeight * aspectRatio;
+                    }
+                } else {
+                    // Standart sayfa boyutu
+                    pageWidth = selectedSize.width;
+                    pageHeight = selectedSize.height;
+                }
+
+                // Sayfa oluştur ve resmi ekle
+                const page = pdfDoc.addPage([pageWidth, pageHeight]);
+                
+                // Resmi sayfaya sığdır
+                const imageDims = image.scaleToFit(pageWidth, pageHeight);
+                page.drawImage(image, {
+                    x: (pageWidth - imageDims.width) / 2,
+                    y: (pageHeight - imageDims.height) / 2,
+                    width: imageDims.width,
+                    height: imageDims.height,
+                });
+
+                updateProgress(90);
+
+                // PDF'i kaydet
+                const pdfBytes = await pdfDoc.save();
+                updateProgress(100);
+
+                // Blob oluştur
+                convertedBlob = new Blob([pdfBytes], { type: "application/pdf" });
+                
+                showResult(getTranslation('pdfCreated'), 'success');
+
+                // Kaydet butonu - GÜNCELLENDİ
+                const saveBtn = document.createElement('button');
+                saveBtn.className = 'download-btn';
+                saveBtn.textContent = getTranslation('savePdf');
+                saveBtn.addEventListener('click', () => {
+                    const baseName = file.name.split('.')[0];
+                    const pdfName = `photo_cnvrt_${baseName}.pdf`;
+                    savePDF(convertedBlob, pdfName);
+                });
+                result.appendChild(saveBtn);
+
+                return convertedBlob;
+
+            } catch (error) {
+                console.error('Dönüştürme hatası:', error);
+                throw new Error(getTranslation('conversionError') + error.message);
+            }
+        }
+
+        // Dönüştürme butonu
+        convertBtn.addEventListener('click', async () => {
+            if (!selectedFile) {
+                showResult(getTranslation('selectImageError'), 'error');
+                return;
+            }
+
+            try {
+                convertBtn.disabled = true;
+                const pageSize = pageSizeSelect.value;
+                await convertImageToPDF(selectedFile, pageSize);
+            } catch (error) {
+                console.error('Dönüştürme hatası:', error);
+                showResult(getTranslation('error') + error.message, 'error');
+            } finally {
+                convertBtn.disabled = false;
+            }
+        });
+
+        // Sayfa yüklendiğinde temayı kontrol et ve dili güncelle
+        document.addEventListener('DOMContentLoaded', function() {
+            handleThemeChange(mediaQuery);
+            setupLanguageListener();
+            updateLanguage();
+            
+            // Lang.js'nin yüklenmesini bekle
+            setTimeout(updateLanguage, 100);
+        });
+
+        // Lang.js'nin yüklenip yüklenmediğini kontrol et
+        let langCheckCount = 0;
+        const maxLangChecks = 10;
+        const checkLangLoaded = setInterval(() => {
+            if (typeof languageConfig !== 'undefined') {
+                clearInterval(checkLangLoaded);
+                setupLanguageListener();
+                updateLanguage();
+            } else if (langCheckCount >= maxLangChecks) {
+                clearInterval(checkLangLoaded);
+                console.warn('Lang.js yüklenemedi, varsayılan dil kullanılıyor');
+            }
+            langCheckCount++;
+        }, 200);
+    </script>
+</body>
+</html>
