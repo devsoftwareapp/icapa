@@ -41,7 +41,15 @@ flutter:
   uses-material-design: true
   
   assets:
-
+    # --- YENİ kutuphaneler ve lang.js ---
+     - assets/web/lang.js
+     - assets/web/francy.min.js
+     - assets/web/pdf-lib.min.js
+     - assets/web/pdf.min.js
+     - assets/web/tesseract.min.js
+     
+     
+    
     
     # --- YENİ TOOLS HTML DOSYALARI ---
     - assets/web/birlestirme.html
