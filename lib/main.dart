@@ -1607,6 +1607,46 @@ class _ViewerScreenState extends State<ViewerScreen> {
     }
   }
 
+  Future<void> _saveEditedPdfToDownloads(String filename, String base64Data) async {
+    try {
+      final downloadDir = Directory('/storage/emulated/0/Download/PDF Reader');
+      if (!await downloadDir.exists()) {
+        await downloadDir.create(recursive: true);
+      }
+
+      // "update_" prefix ile yeni dosya adı oluştur
+      final baseName = p.basenameWithoutExtension(filename);
+      final newFileName = 'update_$baseName.pdf';
+      final filePath = '${downloadDir.path}/$newFileName';
+
+      // Base64'ü decode et ve dosyaya yaz
+      final bytes = base64Decode(base64Data);
+      await File(filePath).writeAsBytes(bytes);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('✅ PDF başarıyla kaydedildi: $newFileName'),
+            backgroundColor: Color(0xFFD32F2F),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+
+      print('📁 PDF kaydedildi: $filePath');
+    } catch (e) {
+      print('❌ PDF kaydetme hatası: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('❌ PDF kaydedilirken hata: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -1662,6 +1702,22 @@ class _ViewerScreenState extends State<ViewerScreen> {
                     allowUniversalAccessFromFileURLs: true,
                     supportZoom: true,
                   ),
+                  onWebViewCreated: (controller) {
+                    _controller = controller;
+                    
+                    // JavaScript handler'ı ekle
+                    controller.addJavaScriptHandler(
+                      handlerName: 'onPdfSaved',
+                      callback: (args) {
+                        if (args.length >= 2) {
+                          final filename = args[0] as String;
+                          final base64Data = args[1] as String;
+                          _saveEditedPdfToDownloads(filename, base64Data);
+                        }
+                        return {};
+                      },
+                    );
+                  },
                   onProgressChanged: (controller, progress) {
                     setState(() {
                       _progress = progress / 100;
