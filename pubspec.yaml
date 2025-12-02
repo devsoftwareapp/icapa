@@ -21,7 +21,8 @@ dependencies:
   image_picker: ^1.0.4
   printing: ^5.11.0
   open_file: ^3.3.3
-  flutter_email_sender: ^8.0.0
+  sqflite: ^2.3.0  # SQLite için EKLENMESİ GEREKEN PAKET
+  # flutter_email_sender: ^8.0.0 - Buna gerek yok, kaldırabilirsiniz
   
   
 dev_dependencies:
