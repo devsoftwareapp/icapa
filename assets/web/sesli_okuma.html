@@ -2400,127 +2400,279 @@ if (typeof PDFViewerApplication !== 'undefined') {
 
 <!--ek-->
 
+// ========================================
+// FLUTTER WEBVIEW DOSYA SEÇİMİ FIX
+// ========================================
 
+// Flutter ile iletişim kanalı
+let flutterChannel = null;
 
-
-// FLUTTER WEB DOSYA SEÇİMİ FIX
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("Flutter Web file picker fix loading...");
+// Flutter iletişimi başlat
+function setupFlutterFilePicker() {
+    console.log("Setting up Flutter file picker...");
     
-    // 5 saniye sonra çalıştır (tüm sayfanın yüklenmesini bekle)
-    setTimeout(function() {
-        fixFilePicker();
-    }, 5000);
-    
-    function fixFilePicker() {
-        console.log("Applying file picker fix...");
+    // Flutter WebView kontrolü
+    if (window.flutter_inappwebview || window.flutterWebRenderer) {
+        console.log("Flutter WebView detected");
         
-        // Custom Open butonunu bul
-        const customOpenBtn = document.getElementById('customOpen');
-        if (!customOpenBtn) {
-            console.log("Custom open button not found, retrying...");
-            setTimeout(fixFilePicker, 1000);
-            return;
+        // Channel oluştur
+        flutterChannel = {
+            callHandler: function(method, data) {
+                return new Promise((resolve, reject) => {
+                    if (window.flutter_inappwebview && window.flutter_inappwebview.callHandler) {
+                        window.flutter_inappwebview.callHandler(method, data)
+                            .then(resolve)
+                            .catch(reject);
+                    } else if (window.chrome && window.chrome.webview) {
+                        window.chrome.webview.postMessage(JSON.stringify({
+                            method: method,
+                            data: data
+                        }));
+                        resolve();
+                    } else {
+                        console.log("Fallback: Using Android intent");
+                        resolve();
+                    }
+                });
+            }
+        };
+        
+        // Butonları güncelle
+        updateFilePickerButtons();
+    } else {
+        console.log("Not in Flutter WebView, using standard file picker");
+        setTimeout(updateFilePickerButtons, 1000);
+    }
+}
+
+// Butonları güncelle
+function updateFilePickerButtons() {
+    console.log("Updating file picker buttons...");
+    
+    // 1. "PDF SEÇ" butonunu bul
+    const customOpenBtn = document.getElementById('customOpen');
+    if (customOpenBtn) {
+        console.log("Found customOpen button");
+        
+        // Mevcut event'i kaydet
+        const originalClick = customOpenBtn.onclick;
+        
+        // Yeni event ekle
+        customOpenBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log("Custom Open button clicked");
+            
+            // Önce orijinal event çalışsın
+            if (originalClick) {
+                originalClick.call(this, e);
+            }
+            
+            // Flutter için dosya seçimi başlat
+            openFilePickerInFlutter();
+            
+            return false;
+        };
+        
+        customOpenBtn.style.cursor = 'pointer';
+    }
+    
+    // 2. Secondary Open File butonunu bul
+    const secondaryOpenBtn = document.getElementById('secondaryOpenFile');
+    if (secondaryOpenBtn) {
+        console.log("Found secondaryOpenFile button");
+        
+        const originalSecondaryClick = secondaryOpenBtn.onclick;
+        
+        secondaryOpenBtn.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log("Secondary Open button clicked");
+            
+            if (originalSecondaryClick) {
+                originalSecondaryClick.call(this, e);
+            }
+            
+            openFilePickerInFlutter();
+            
+            return false;
+        };
+        
+        secondaryOpenBtn.style.cursor = 'pointer';
+    }
+}
+
+// Flutter'dan dosya seçimi başlat
+function openFilePickerInFlutter() {
+    console.log("Opening file picker via Flutter...");
+    
+    // Flutter channel varsa kullan
+    if (flutterChannel) {
+        flutterChannel.callHandler('openFilePicker', {
+            type: 'pdf',
+            title: 'PDF Dosyası Seç'
+        }).then(result => {
+            console.log("File picker result:", result);
+            
+            if (result && result.filePath) {
+                // PDF.js'e dosyayı yükle
+                loadPdfFile(result.filePath, result.fileName);
+            }
+        }).catch(error => {
+            console.error("File picker error:", error);
+            // Fallback: Gizli file input oluştur
+            createFallbackFilePicker();
+        });
+    } else {
+        // Fallback: Gizli file input
+        createFallbackFilePicker();
+    }
+}
+
+// Gizli file input (fallback)
+function createFallbackFilePicker() {
+    console.log("Creating fallback file picker");
+    
+    // Eski input'u temizle
+    const oldInputs = document.querySelectorAll('.fallback-file-input');
+    oldInputs.forEach(input => {
+        if (input.parentNode) {
+            input.parentNode.removeChild(input);
+        }
+    });
+    
+    // Yeni input oluştur
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,application/pdf';
+    fileInput.className = 'fallback-file-input';
+    fileInput.style.cssText = `
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100px !important;
+        height: 100px !important;
+        opacity: 0.001 !important;
+        cursor: pointer !important;
+        z-index: 999999 !important;
+        font-size: 100px !important;
+        pointer-events: all !important;
+    `;
+    
+    fileInput.onchange = function(e) {
+        if (this.files && this.files.length > 0) {
+            const file = this.files[0];
+            console.log("File selected:", file.name);
+            
+            // Object URL oluştur
+            const fileUrl = URL.createObjectURL(file);
+            
+            // PDF.js'e yükle
+            if (typeof PDFViewerApplication !== 'undefined') {
+                PDFViewerApplication.open(fileUrl);
+                
+                // Dosya adını göster
+                const openBtn = document.getElementById('customOpen');
+                if (openBtn) {
+                    openBtn.innerHTML = `📄 ${file.name.substring(0, 15)}...`;
+                    openBtn.title = `Seçilen: ${file.name}`;
+                }
+            }
         }
         
-        // Mevcut onclick event'ini kaydet
-        const originalOnClick = customOpenBtn.onclick;
-        
-        // Yeni click event'i ekle
-        customOpenBtn.addEventListener('click', function(e) {
-            console.log("Custom open button clicked");
-            
-            // Önce orijinal event'i çalıştır
-            if (originalOnClick) {
-                originalOnClick.call(this, e);
-            }
-            
-            // Flutter Web kontrolü
-            if (window.flutterWebRenderer || window.location.hostname === 'localhost') {
-                console.log("Flutter Web detected, creating fallback...");
-                
-                // 2 saniye bekle, PDF yüklenmediyse fallback çalıştır
-                setTimeout(function() {
-                    const viewer = document.getElementById('viewerContainer');
-                    const pdfView = document.querySelector('.pdfViewer');
-                    
-                    if ((viewer && viewer.children.length === 0) || 
-                        (pdfView && pdfView.children.length === 0)) {
-                        console.log("PDF not loaded, using fallback file picker");
-                        createFallbackFilePicker();
-                    }
-                }, 2000);
-            }
-        });
-        
-        console.log("File picker fix applied successfully");
-    }
-    
-    function createFallbackFilePicker() {
-        // Gizli file input oluştur
-        const fileInput = document.createElement('input');
-        fileInput.type = 'file';
-        fileInput.accept = '.pdf,application/pdf';
-        fileInput.style.cssText = `
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            width: 100% !important;
-            height: 100% !important;
-            opacity: 0.001 !important;
-            cursor: pointer !important;
-            z-index: 9999999 !important;
-            font-size: 100px !important;
-        `;
-        
-        fileInput.onclick = function(e) {
-            e.stopPropagation();
-        };
-        
-        fileInput.onchange = function(e) {
-            if (this.files && this.files.length > 0) {
-                const file = this.files[0];
-                console.log("File selected:", file.name);
-                
-                // PDF.js'e yükle
-                if (typeof PDFViewerApplication !== 'undefined') {
-                    const fileURL = URL.createObjectURL(file);
-                    PDFViewerApplication.open(fileURL);
-                }
-            }
-            
-            // Input'u temizle ve kaldır
-            this.value = '';
-            setTimeout(() => {
-                if (this.parentNode) {
-                    this.parentNode.removeChild(this);
-                }
-            }, 100);
-        };
-        
-        // Body'ye ekle ve tıkla
-        document.body.appendChild(fileInput);
-        fileInput.click();
-        
-        // 10 saniye sonra kaldır (güvenlik için)
+        // Input'u temizle
+        this.value = '';
         setTimeout(() => {
-            if (fileInput.parentNode) {
-                fileInput.parentNode.removeChild(fileInput);
+            if (this.parentNode) {
+                this.parentNode.removeChild(this);
             }
-        }, 10000);
-    }
+        }, 100);
+    };
     
-    // PDF.js event'lerini de dinle
+    // Body'ye ekle ve tıkla
+    document.body.appendChild(fileInput);
+    fileInput.click();
+    
+    // 10 saniye sonra kaldır
+    setTimeout(() => {
+        if (fileInput.parentNode) {
+            fileInput.parentNode.removeChild(fileInput);
+        }
+    }, 10000);
+}
+
+// Dosyayı PDF.js'e yükle
+function loadPdfFile(filePath, fileName) {
+    console.log("Loading PDF:", filePath, fileName);
+    
+    try {
+        // PDF.js'e dosyayı yükle
+        if (typeof PDFViewerApplication !== 'undefined') {
+            // File:// URL'si oluştur
+            const fileUrl = 'file://' + filePath;
+            PDFViewerApplication.open(fileUrl);
+            
+            // Buton metnini güncelle
+            const openBtn = document.getElementById('customOpen');
+            if (openBtn && fileName) {
+                const shortName = fileName.length > 15 ? fileName.substring(0, 15) + '...' : fileName;
+                openBtn.innerHTML = `📄 ${shortName}`;
+                openBtn.title = `Seçilen: ${fileName}`;
+            }
+        } else {
+            console.error("PDFViewerApplication not available");
+            alert("PDF viewer hazır değil. Lütfen sayfayı yenileyin.");
+        }
+    } catch (error) {
+        console.error("PDF loading error:", error);
+        alert("PDF yüklenirken hata: " + error.message);
+    }
+}
+
+// PDF.js event'lerini dinle
+function setupPdfJsListeners() {
     if (typeof PDFViewerApplication !== 'undefined') {
-        PDFViewerApplication.eventBus.on('fileinputchange', function() {
-            console.log("PDF.js file input changed - fix may have worked");
+        PDFViewerApplication.eventBus.on('fileinputchange', function(evt) {
+            console.log("PDF.js file input changed");
         });
         
         PDFViewerApplication.eventBus.on('documentloaded', function() {
             console.log("PDF loaded successfully");
+            
+            // Butonu orijinal haline getir
+            setTimeout(() => {
+                const openBtn = document.getElementById('customOpen');
+                if (openBtn && !openBtn.textContent.includes('🌍')) {
+                    openBtn.innerHTML = '📄 PDF SEÇ';
+                    openBtn.title = 'PDF Seç';
+                }
+            }, 1000);
         });
     }
+}
+
+// DOM yüklendiğinde çalıştır
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("Setting up Flutter file picker integration...");
+    
+    // 2 saniye bekle (sayfanın tam yüklenmesi için)
+    setTimeout(() => {
+        setupFlutterFilePicker();
+        setupPdfJsListeners();
+    }, 2000);
 });
+
+// Sayfa görünür olduğunda da kontrol et
+document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+        setTimeout(updateFilePickerButtons, 500);
+    }
+});
+
+
+
 </script>
 
 
