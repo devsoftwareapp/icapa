@@ -23,44 +23,8 @@
 
 
 
-    <!--BURADA BASLAR-->
-<script>
-document.addEventListener("webviewerloaded", () => {
-  // worker tanımı
-  window.pdfjsLib = window.pdfjsLib || {};
-  pdfjsLib.GlobalWorkerOptions.workerSrc = "assets/build/pdf.worker.mjs";
 
-  const params = new URLSearchParams(window.location.search);
-  const base64 = params.get("base64");
-  if (!base64) return;
-
-  // Base64 → Uint8Array
-  const raw = atob(base64.split(',')[1]);
-  const len = raw.length;
-  const bytes = new Uint8Array(len);
-  for (let i = 0; i < len; i++) bytes[i] = raw.charCodeAt(i);
-
-  // Blob
-  const blob = new Blob([bytes], { type: "application/pdf" });
-  const blobUrl = URL.createObjectURL(blob);
-
-  const wait = setInterval(() => {
-    if (window.PDFViewerApplication?.initialized) {
-      clearInterval(wait);
-      PDFViewerApplication.open({ url: blobUrl });
-    }
-  }, 50);
-});
-</script>
     <!--Burada Biter-->
-
-
-
-
-
-      
-
-
 
 
 
