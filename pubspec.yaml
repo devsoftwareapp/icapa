@@ -49,7 +49,7 @@ flutter:
     - assets/web/viewer.html
     - assets/web/viewer.mjs
     - assets/web/images/
-    - assets/icon/
+    - assets/web/index.html
     - assets/icon/logo.png
     - assets/icon/drive.png
     - assets/icon/onedrive.png
