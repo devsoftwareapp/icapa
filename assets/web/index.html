@@ -1,9 +1,97 @@
 <!DOCTYPE html>
-<html>
-  <body style="padding:40px; font-size:20px;">
-    <div>InAppWebView Çalışıyor</div>
-    <button onclick="window.location.href='viewer.html'">
-      viewer.html aç
-    </button>
-  </body>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Seç</title>
+
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+      background: #f8f8f8;
+    }
+
+    button {
+      padding: 12px 20px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      margin-bottom: 20px;
+    }
+
+    .pdf-item {
+      padding: 12px;
+      background: #ffffff;
+      margin-top: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+
+  </style>
+</head>
+<body>
+
+  <h2>📄 PDF Seç ve Aç</h2>
+
+  <button onclick="selectPdf()">PDF Seç</button>
+
+  <div id="list"></div>
+
+  <script>
+    let pdfList = [];
+
+    function selectPdf() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "application/pdf";
+
+      input.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+          pdfList.push({
+            name: file.name,
+            base64: reader.result
+          });
+
+          renderList();
+        };
+
+        reader.readAsDataURL(file);
+      };
+
+      input.click();
+    }
+
+    function renderList() {
+      const list = document.getElementById("list");
+      list.innerHTML = "";
+
+      pdfList.forEach((pdf, index) => {
+        const item = document.createElement("div");
+        item.className = "pdf-item";
+        item.textContent = pdf.name;
+
+        item.onclick = () => {
+          const url =
+            "viewer.html?base64=" +
+            encodeURIComponent(pdf.base64) +
+            "&name=" +
+            encodeURIComponent(pdf.name);
+
+          window.location.href = url;
+        };
+
+        list.appendChild(item);
+      });
+    }
+  </script>
+
+</body>
 </html>
